@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/aspnet-mongo/bin/Debug/net7.0
+/aspnet-mongo/obj
+/aspnet-mongo/appsettings.Development.json
