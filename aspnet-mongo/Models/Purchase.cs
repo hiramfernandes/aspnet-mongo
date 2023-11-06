@@ -19,7 +19,7 @@ namespace aspnet_mongo.Models
         [BsonElement("vendorName")]
         public string? VendorName { get; set; }
 
-        public double? totalAmount { get; set; }
+        public double? TotalAmount { get; set; }
 
         [DataMember]
         [BsonElement("items")] 

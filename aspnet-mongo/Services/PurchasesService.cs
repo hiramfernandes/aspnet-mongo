@@ -7,7 +7,7 @@ namespace aspnet_mongo.Services
 {
     public interface IPurchasesService
     {
-        Task CreateAsync(Purchase newPurchase);
+        Task CreateAsync(Purchase newPurchase, CancellationToken cancellationToken);
         Task<List<Purchase>> GetAllAsync();
         Task<Purchase?> GetAsync(string id);
         Task RemoveAsync(string id);
@@ -36,8 +36,8 @@ namespace aspnet_mongo.Services
         public async Task<Purchase?> GetAsync(string id) =>
             await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-        public async Task CreateAsync(Purchase newPurchase) =>
-            await _purchasesCollection.InsertOneAsync(newPurchase);
+        public async Task CreateAsync(Purchase newPurchase, CancellationToken cancellationToken) =>
+            await _purchasesCollection.InsertOneAsync(newPurchase, null, cancellationToken);
 
         public async Task UpdateAsync(string id, Purchase updatedPurchase) =>
             await _purchasesCollection.ReplaceOneAsync(x => x.Id == id, updatedPurchase);

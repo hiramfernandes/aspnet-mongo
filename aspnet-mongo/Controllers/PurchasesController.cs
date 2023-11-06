@@ -1,4 +1,6 @@
-﻿using aspnet_mongo.Services;
+﻿using aspnet_mongo.Models;
+using aspnet_mongo.Models.DTO;
+using aspnet_mongo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +24,20 @@ namespace aspnet_mongo.Controllers
             var purchases = await _purchasesService.GetAllAsync();
 
             return Ok(purchases);
+        }
+
+        [HttpPost]
+        public async Task CreatePurchase(CancellationToken cancellationToken, PurchaseDto newPurchaseDto)
+        {
+            var purchase = new Purchase()
+            {
+                PurchaseDate = newPurchaseDto.PurchaseDate,
+                VendorName = newPurchaseDto.VendorName,
+                TotalAmount = newPurchaseDto.TotalAmount,
+                Items = newPurchaseDto.Items
+            };
+
+            await _purchasesService.CreateAsync(purchase, cancellationToken);
         }
     }
 }
