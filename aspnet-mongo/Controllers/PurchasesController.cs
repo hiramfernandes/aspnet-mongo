@@ -19,11 +19,21 @@ namespace aspnet_mongo.Controllers
         }
 
         [HttpGet]
+        [Produces(typeof(List<Purchase>))]
         public async Task<IActionResult> GetPurchases(CancellationToken cancellationToken)
         {
             var purchases = await _purchasesService.GetAllAsync();
 
             return Ok(purchases);
+        }
+
+        [HttpGet("{id}")]
+        [Produces(typeof(Purchase))]
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
+        {
+            var purchase = await _purchasesService.GetAsync(id);
+
+            return Ok(purchase);
         }
 
         [HttpPost]
