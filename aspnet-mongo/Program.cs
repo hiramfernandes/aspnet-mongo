@@ -7,7 +7,17 @@ namespace aspnet_mongo
     {
         public static void Main(string[] args)
         {
+            var allowedOriginsPolicyName = "_allowedOrigins";
+
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add CORS
+            builder.Services.AddCors(options => {
+                options.AddPolicy(name: allowedOriginsPolicyName,
+                policy => {
+                    policy.WithOrigins("https://aspnet-mongo.azurewebsites.net/");
+                });
+            });
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -35,6 +45,8 @@ namespace aspnet_mongo
             app.MapControllers();
 
             app.UseRouting();
+
+            app.UseCors(allowedOriginsPolicyName);
 
             //app.UseAuthorization();
 
