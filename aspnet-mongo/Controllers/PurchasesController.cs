@@ -49,5 +49,13 @@ namespace aspnet_mongo.Controllers
 
             await _purchasesService.CreateAsync(purchase, cancellationToken);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> RemovePurchase(string id, CancellationToken cancellationToken)
+        {
+            await _purchasesService.RemoveAsync(id);
+
+            return Ok();
+        }
     }
 }
