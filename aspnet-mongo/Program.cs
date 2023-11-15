@@ -20,7 +20,6 @@ namespace aspnet_mongo
                     policy.WithOrigins("https://aspnet-mongo.azurewebsites.net/");
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
-                    policy.AllowCredentials();
                     // policy.AllowAnyOrigin();
                 });
             });
