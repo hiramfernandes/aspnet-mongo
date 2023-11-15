@@ -17,10 +17,11 @@ namespace aspnet_mongo
                 options.AddPolicy(name: allowedOriginsPolicyName,
                 policy =>
                 {
-                    policy.WithOrigins(@"https://aspnet-mongo.azurewebsites.net");
+                    // TODO: Re-enable specific origins once able to fix this
+                    // policy.WithOrigins(@"https://aspnet-mongo.azurewebsites.net");
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
-                    // policy.AllowAnyOrigin();
+                    policy.AllowAnyOrigin();
                 });
             });
 
