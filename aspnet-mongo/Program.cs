@@ -17,10 +17,10 @@ namespace aspnet_mongo
                 options.AddPolicy(name: allowedOriginsPolicyName,
                 policy =>
                 {
-                    policy.WithOrigins("https://aspnet-mongo.azurewebsites.net/");
+                    // policy.WithOrigins("https://aspnet-mongo.azurewebsites.net/");
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
-                    // policy.AllowAnyOrigin();
+                    policy.AllowAnyOrigin();
                 });
             });
 
