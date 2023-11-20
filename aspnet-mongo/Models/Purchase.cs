@@ -16,6 +16,10 @@ namespace aspnet_mongo.Models
         public DateTime? PurchaseDate { get; set; }
 
         [DataMember]
+        [BsonElement("purchaseUrl")]
+        public string? PurchaseUrl { get; set; }
+
+        [DataMember]
         [BsonElement("vendorName")]
         public string? VendorName { get; set; }
 

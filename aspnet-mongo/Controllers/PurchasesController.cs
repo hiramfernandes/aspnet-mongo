@@ -42,6 +42,7 @@ namespace aspnet_mongo.Controllers
             var purchase = new Purchase()
             {
                 PurchaseDate = newPurchaseDto.PurchaseDate,
+                PurchaseUrl = newPurchaseDto.Url,
                 VendorName = newPurchaseDto.VendorName,
                 TotalAmount = newPurchaseDto.TotalAmount,
                 Items = newPurchaseDto.Items
