@@ -36,6 +36,26 @@ namespace aspnet_mongo.Controllers
             return Ok(purchase);
         }
 
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdatePurchase(string id, PurchaseDto purchaseDto)
+        {
+            var purchase = await _purchasesService.GetAsync(id);
+            if (purchase == null)
+                return BadRequest("Unable to find purchase");
+
+            purchase.PurchaseDate = purchaseDto.PurchaseDate;
+            purchase.VendorName = purchaseDto.VendorName;
+            purchase.PurchaseUrl = purchaseDto.Url;
+            purchase.Items = purchaseDto.Items;
+            purchase.TotalAmount = purchaseDto.TotalAmount;
+
+            await _purchasesService.UpdateAsync(id, purchase);
+
+            return Ok(purchase);
+        }
+
+
         [HttpPost]
         public async Task CreatePurchase(CancellationToken cancellationToken, PurchaseDto newPurchaseDto)
         {
