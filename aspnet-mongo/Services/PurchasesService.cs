@@ -34,7 +34,6 @@ namespace aspnet_mongo.Services
         {
             var queryableCollection = _purchasesCollection.AsQueryable();
             return await Task.FromResult( queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList() );
-            //return await _purchasesCollection.Find(_ => true).ToListAsync();
         }
 
         public async Task<Purchase?> GetAsync(string id) =>
