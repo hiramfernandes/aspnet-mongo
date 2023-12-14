@@ -7,7 +7,23 @@ namespace aspnet_mongo
     {
         public static void Main(string[] args)
         {
+            var allowedOriginsPolicyName = "_allowedOrigins";
+
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: allowedOriginsPolicyName,
+                policy =>
+                {
+                    // TODO: Re-enable specific origins once able to fix this
+                    // policy.WithOrigins(@"https://aspnet-mongo.azurewebsites.net");
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.AllowAnyOrigin();
+                });
+            });
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -21,25 +37,14 @@ namespace aspnet_mongo
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
             app.MapControllers();
-
             app.UseRouting();
-
-            //app.UseAuthorization();
-
-            //app.MapRazorPages();
+            app.UseCors(allowedOriginsPolicyName);
+            app.UseAuthorization();
 
             app.Run();
         }

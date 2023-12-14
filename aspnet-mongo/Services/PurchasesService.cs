@@ -7,7 +7,7 @@ namespace aspnet_mongo.Services
 {
     public interface IPurchasesService
     {
-        Task CreateAsync(Purchase newPurchase);
+        Task CreateAsync(Purchase newPurchase, CancellationToken cancellationToken);
         Task<List<Purchase>> GetAllAsync();
         Task<Purchase?> GetAsync(string id);
         Task RemoveAsync(string id);
@@ -30,14 +30,17 @@ namespace aspnet_mongo.Services
             _purchasesCollection = mongoDatabase.GetCollection<Purchase>(collectionName);
         }
 
-        public async Task<List<Purchase>> GetAllAsync() =>
-            await _purchasesCollection.Find(_ => true).ToListAsync();
+        public async Task<List<Purchase>> GetAllAsync()
+        {
+            var queryableCollection = _purchasesCollection.AsQueryable();
+            return await Task.FromResult( queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList() );
+        }
 
         public async Task<Purchase?> GetAsync(string id) =>
             await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-        public async Task CreateAsync(Purchase newPurchase) =>
-            await _purchasesCollection.InsertOneAsync(newPurchase);
+        public async Task CreateAsync(Purchase newPurchase, CancellationToken cancellationToken) =>
+            await _purchasesCollection.InsertOneAsync(newPurchase, null, cancellationToken);
 
         public async Task UpdateAsync(string id, Purchase updatedPurchase) =>
             await _purchasesCollection.ReplaceOneAsync(x => x.Id == id, updatedPurchase);
