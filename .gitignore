@@ -5,3 +5,9 @@
 /aspnet-mongo/bin/Debug/net7.0
 /aspnet-mongo/obj
 /aspnet-mongo/appsettings.Development.json
+/.vs/aspnet-mongo/DesignTimeBuild/
+/.vs/aspnet-mongo/v17/.suo
+/aspnet-mongo/aspnet-mongo.csproj.user
+/.vs/aspnet-mongo/FileContentIndex/
+/.vs/aspnet-mongo/v17/.suo
+/.vs/aspnet-mongo/DesignTimeBuild/.dtbcache.v2
