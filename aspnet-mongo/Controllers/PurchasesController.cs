@@ -11,9 +11,9 @@ namespace aspnet_mongo.Controllers
     [AllowAnonymous]
     public class PurchasesController : ControllerBase
     {
-        private readonly IPurchasesService _purchasesService;
+        private readonly IPurchaseService _purchasesService;
 
-        public PurchasesController(IPurchasesService purchasesService)
+        public PurchasesController(IPurchaseService purchasesService)
         {
             _purchasesService = purchasesService;
         }
@@ -68,7 +68,7 @@ namespace aspnet_mongo.Controllers
                 Items = newPurchaseDto.Items
             };
 
-            await _purchasesService.CreateAsync(purchase, cancellationToken);
+            await _purchasesService.CreateAsync(purchase);
         }
 
         [HttpDelete("{id}")]

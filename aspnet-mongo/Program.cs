@@ -31,7 +31,8 @@ namespace aspnet_mongo
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddScoped<IPurchasesService, PurchasesService>();
+            builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+            builder.Services.AddScoped<IVendorService, VendorService>();
             builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
 
             var app = builder.Build();
