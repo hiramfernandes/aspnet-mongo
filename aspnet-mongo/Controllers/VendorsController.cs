@@ -42,5 +42,13 @@ namespace aspnet_mongo.Controllers
             await _vendorService.CreateVendor(vendorDto, cancellationToken);
             return Ok();
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteVendor(string id, CancellationToken cancellationToken)
+        {
+            await _vendorService.RemoveAsync(id);
+
+            return Ok();
+        }
     }
 }

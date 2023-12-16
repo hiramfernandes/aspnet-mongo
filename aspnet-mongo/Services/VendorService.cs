@@ -11,6 +11,7 @@ namespace aspnet_mongo.Services
         Task<IEnumerable<Vendor>> GetAllAsync();
         Task<Vendor> GetById(string id);
         Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
+        Task RemoveAsync(string id);
     }
 
     public class VendorService : IVendorService
@@ -58,5 +59,8 @@ namespace aspnet_mongo.Services
 
             await _vendorsCollection.InsertOneAsync(vendor, options, cancellationToken);
         }
+
+        public async Task RemoveAsync(string id) =>
+            await _vendorsCollection.DeleteOneAsync(x => x.Id == id);
     }
 }
