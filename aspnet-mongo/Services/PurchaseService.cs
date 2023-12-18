@@ -31,8 +31,11 @@ namespace aspnet_mongo.Services
             _purchasesCollection = mongoDatabase.GetCollection<Purchase>(collectionName);
         }
 
-        public async Task<List<Purchase>> GetAllAsync() =>
-            await _purchasesCollection.Find(_ => true).ToListAsync();
+        public async Task<List<Purchase>> GetAllAsync()
+        {
+            var queryableCollection = _purchasesCollection.AsQueryable();
+            return await Task.FromResult(queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList());
+        }
 
         public async Task<Purchase?> GetAsync(string id) =>
             await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
