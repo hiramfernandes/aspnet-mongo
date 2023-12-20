@@ -19,10 +19,9 @@ namespace aspnet_mongo.Controllers
         }
 
         [HttpGet]
-        [Produces(typeof(IEnumerable<Vendor>))]
+        [Produces(typeof(IEnumerable<GetVendorDto>))]
         public async Task<IActionResult> GetVendors(CancellationToken cancellationToken)
         {
-            // TODO: Create output DTO
             var vendors = await _vendorService.GetAllAsync();
             return Ok(vendors);
         }
@@ -32,7 +31,6 @@ namespace aspnet_mongo.Controllers
         public async Task<IActionResult> GetVendorById(string id)
         {
             var vendor = await _vendorService.GetById(id);
-
             return Ok(vendor);
         }
 

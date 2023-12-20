@@ -8,8 +8,8 @@ namespace aspnet_mongo.Services
 {
     public interface IVendorService
     {
-        Task<IEnumerable<Vendor>> GetAllAsync();
-        Task<Vendor> GetById(string id);
+        Task<IEnumerable<GetVendorDto>> GetAllAsync();
+        Task<GetVendorDto> GetById(string id);
         Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
         Task RemoveAsync(string id);
     }
@@ -31,13 +31,17 @@ namespace aspnet_mongo.Services
             _vendorsCollection = mongoDatabase.GetCollection<Vendor>(_collectionName);
         }
 
-        public async Task<IEnumerable<Vendor>> GetAllAsync() =>
-            await _vendorsCollection.Find(_ => true).ToListAsync();
+        public async Task<IEnumerable<GetVendorDto>> GetAllAsync()
+        {
+            var vendors = await _vendorsCollection.Find(_ => true).ToListAsync();
 
-        public async Task<Vendor> GetById(string id)
+            return vendors.Select(x => new GetVendorDto { Id = x.Id, Name = x.Name });
+        }
+
+        public async Task<GetVendorDto> GetById(string id)
         {
             var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-            return vendor;
+            return new GetVendorDto { Id = vendor.Id, Name = vendor.Name };
         }
 
         public async Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken)
