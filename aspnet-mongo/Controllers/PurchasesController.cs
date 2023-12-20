@@ -65,6 +65,7 @@ namespace aspnet_mongo.Controllers
                 PurchaseDate = newPurchaseDto.PurchaseDate,
                 PurchaseUrl = newPurchaseDto.Url,
                 VendorName = newPurchaseDto.VendorName,
+                VendorId = newPurchaseDto.VendorId,
                 TotalAmount = newPurchaseDto.TotalAmount,
                 Items = newPurchaseDto.Items
             };
