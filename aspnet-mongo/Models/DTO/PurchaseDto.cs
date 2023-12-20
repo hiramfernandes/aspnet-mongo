@@ -6,6 +6,7 @@ namespace aspnet_mongo.Models.DTO
         public DateTime? PurchaseDate { get; set; }
         public string? Url { get; set; }
         public string? VendorName { get; set; }
+        public string? VendorId { get; set; }
         public double? TotalAmount { get; set; }
         public string[]? Items { get; set; }
     }

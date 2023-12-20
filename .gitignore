@@ -2,11 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/aspnet-mongo/bin/Debug/net7.0
-/aspnet-mongo/obj
-/aspnet-mongo/appsettings.Development.json
-/aspnet-mongo/aspnet-mongo.csproj.user
-
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
@@ -16,3 +11,10 @@
 x64/
 [Bb]in/
 [Oo]bj/
+
+
+/.vs/aspnet-mongo/v17/.futdcache.v2
+/.vs/ProjectEvaluation/aspnet-mongo.metadata.v7.bin
+/aspnet-mongo/appsettings.Development.json
+*.user
+*.bin

@@ -46,6 +46,7 @@ namespace aspnet_mongo.Controllers
 
             purchase.PurchaseDate = purchaseDto.PurchaseDate;
             purchase.VendorName = purchaseDto.VendorName;
+            purchase.VendorId = purchaseDto.VendorId;
             purchase.PurchaseUrl = purchaseDto.Url;
             purchase.Items = purchaseDto.Items;
             purchase.TotalAmount = purchaseDto.TotalAmount;
