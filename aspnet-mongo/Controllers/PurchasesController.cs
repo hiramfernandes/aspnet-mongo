@@ -19,7 +19,7 @@ namespace aspnet_mongo.Controllers
         }
 
         [HttpGet]
-        [Produces(typeof(List<Purchase>))]
+        [Produces(typeof(List<GetPurchaseDto>))]
         public async Task<IActionResult> GetPurchases(CancellationToken cancellationToken)
         {
             var purchases = await _purchasesService.GetAllAsync();

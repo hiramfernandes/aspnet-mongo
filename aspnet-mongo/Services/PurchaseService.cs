@@ -1,4 +1,5 @@
 ﻿using aspnet_mongo.Models;
+using aspnet_mongo.Models.DTO;
 using aspnet_mongo.Models.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -8,7 +9,7 @@ namespace aspnet_mongo.Services
     public interface IPurchaseService
     {
         Task CreateAsync(Purchase newPurchase);
-        Task<List<Purchase>> GetAllAsync();
+        Task<IEnumerable<GetPurchaseDto>> GetAllAsync();
         Task<Purchase?> GetAsync(string id);
         Task RemoveAsync(string id);
         Task UpdateAsync(string id, Purchase updatedPurchase);
@@ -18,8 +19,9 @@ namespace aspnet_mongo.Services
     {
         private readonly string _collectionName = "purchases";
         private readonly IMongoCollection<Purchase> _purchasesCollection;
+        private readonly IVendorService _vendorService;
 
-        public PurchaseService(IOptions<MongoDbSettings> databaseSettings)
+        public PurchaseService(IOptions<MongoDbSettings> databaseSettings, IVendorService vendorService)
         {
             var connectionString = databaseSettings.Value.ConnectionString;
             var collectionName = databaseSettings.Value.CollectionName;
@@ -28,13 +30,19 @@ namespace aspnet_mongo.Services
             var mongoClient = new MongoClient(connectionString);
             var mongoDatabase = mongoClient.GetDatabase(dbName);
 
+            _vendorService = vendorService;
             _purchasesCollection = mongoDatabase.GetCollection<Purchase>(collectionName);
         }
 
-        public async Task<List<Purchase>> GetAllAsync()
+        public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync()
         {
             var queryableCollection = _purchasesCollection.AsQueryable();
-            return await Task.FromResult(queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList());
+            var purchases = queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList();
+
+            var vendors = await _vendorService.GetAllAsync();
+            var purchaseDtos = purchases.Select(purchase => MapFrom(purchase, vendors));
+
+            return await Task.FromResult(purchaseDtos);
         }
 
         public async Task<Purchase?> GetAsync(string id) =>
@@ -48,6 +56,21 @@ namespace aspnet_mongo.Services
 
         public async Task RemoveAsync(string id) =>
             await _purchasesCollection.DeleteOneAsync(x => x.Id == id);
+
+        private GetPurchaseDto MapFrom(Purchase purchase, IEnumerable<GetVendorDto> vendors)
+        {
+            var vendor = vendors.FirstOrDefault(x => x.Id == purchase.VendorId);
+            return new GetPurchaseDto()
+            {
+                Id = purchase.Id,
+                PurchaseDate = purchase.PurchaseDate,
+                PurchaseUrl = purchase.PurchaseUrl,
+                TotalAmount = purchase.TotalAmount,
+                VendorId = vendor?.Id,
+                VendorName = vendor?.Name,
+                VendorLogoUrl = vendor?.LogoUrl
+            };
+        }
     }
 }
 

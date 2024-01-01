@@ -35,7 +35,7 @@ namespace aspnet_mongo.Services
         {
             var vendors = await _vendorsCollection.Find(_ => true).ToListAsync();
 
-            return vendors.Select(x => new GetVendorDto { Id = x.Id, Name = x.Name });
+            return vendors.Select(x => new GetVendorDto { Id = x.Id, Name = x.Name, LogoUrl = x.LogoUrl });
         }
 
         public async Task<GetVendorDto> GetById(string id)
