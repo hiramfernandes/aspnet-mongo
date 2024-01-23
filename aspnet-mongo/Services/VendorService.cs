@@ -11,6 +11,7 @@ namespace aspnet_mongo.Services
         Task<IEnumerable<GetVendorDto>> GetAllAsync();
         Task<GetVendorDto> GetById(string id);
         Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
+        Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken);
         Task RemoveAsync(string id);
     }
 
@@ -41,13 +42,13 @@ namespace aspnet_mongo.Services
         public async Task<GetVendorDto> GetById(string id)
         {
             var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
-            return new GetVendorDto { Id = vendor.Id, Name = vendor.Name };
+            return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
         }
 
         public async Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken)
         {
             var vendor = new Vendor()
-            { 
+            {
                 Name = vendorDto.Name,
                 Location = vendorDto.Location,
                 LogoUrl = vendorDto.LogoUrl,
@@ -62,6 +63,19 @@ namespace aspnet_mongo.Services
             };
 
             await _vendorsCollection.InsertOneAsync(vendor, options, cancellationToken);
+        }
+
+        public async Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken)
+        {
+            var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (vendor == null)
+                throw new InvalidOperationException($"Vendor with Id {id} does not exist");
+
+            vendor.LogoUrl = updateVendorDto.Url;
+            vendor.Name = updateVendorDto.Name;
+            vendor.UpdatedOn = DateTime.Now;
+
+            await _vendorsCollection.ReplaceOneAsync(x => x.Id == id, vendor);
         }
 
         public async Task RemoveAsync(string id) =>

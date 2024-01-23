@@ -41,6 +41,25 @@ namespace aspnet_mongo.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await _vendorService.UpdateVendor(id, updateVendorDto, cancellationToken);
+            }
+            catch (InvalidOperationException iExc)
+            {
+                return BadRequest(iExc.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+            return Ok();
+        }
+
         [HttpDelete]
         public async Task<IActionResult> DeleteVendor(string id, CancellationToken cancellationToken)
         {
