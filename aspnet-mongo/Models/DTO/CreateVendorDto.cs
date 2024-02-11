@@ -1,8 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-using System.Runtime.Serialization;
-
-namespace aspnet_mongo.Models.DTO
+﻿namespace aspnet_mongo.Models.DTO
 {
     public class CreateVendorDto
     {
