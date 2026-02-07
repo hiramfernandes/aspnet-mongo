@@ -9,7 +9,7 @@ namespace aspnet_mongo.Services
     public interface IPurchaseService
     {
         Task CreateAsync(Purchase newPurchase);
-        Task<IEnumerable<GetPurchaseDto>> GetAllAsync();
+        Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50);
         Task<Purchase?> GetAsync(string id);
         Task RemoveAsync(string id);
         Task UpdateAsync(string id, Purchase updatedPurchase);
@@ -18,6 +18,7 @@ namespace aspnet_mongo.Services
     public class PurchaseService : IPurchaseService
     {
         private readonly string _collectionName = "purchases";
+
         private readonly IMongoCollection<Purchase> _purchasesCollection;
         private readonly IVendorService _vendorService;
 
@@ -34,15 +35,18 @@ namespace aspnet_mongo.Services
             _purchasesCollection = mongoDatabase.GetCollection<Purchase>(collectionName);
         }
 
-        public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync()
+        public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50)
         {
             var queryableCollection = _purchasesCollection.AsQueryable();
-            var purchases = queryableCollection.OrderByDescending(x => x.PurchaseDate).ToList();
+            var purchases = queryableCollection
+                .OrderByDescending(x => x.PurchaseDate)
+                .Take(pageSize)
+                .ToList();
 
             var vendors = await _vendorService.GetAllAsync();
             var purchaseDtos = purchases.Select(purchase => MapFrom(purchase, vendors));
 
-            return await Task.FromResult(purchaseDtos);
+            return purchaseDtos;
         }
 
         public async Task<Purchase?> GetAsync(string id) =>
