@@ -35,6 +35,7 @@ namespace aspnet_mongo
             builder.Services.AddScoped<IVendorService, VendorService>();
             builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
             builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));
+            builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAiIntegration"));
 
             var app = builder.Build();
 
