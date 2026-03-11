@@ -8,14 +8,14 @@ namespace aspnet_mongo.Controllers
     [Route("api/[controller]")]
     public class CallbackController : ControllerBase
     {
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly TelegramBotClient _telegramBotClient;
         private readonly ILogger<CallbackController> _logger;
 
         public CallbackController(
-            ITelegramBotClient telegramBotClient,
+            //ITelegramBotClient telegramBotClient,
             ILogger<CallbackController> logger)
         {
-            _telegramBotClient = telegramBotClient;
+            _telegramBotClient = new TelegramBotClient("8228945569:AAEkD24cO01thWhv6qJxCbyACbeDdYDfEa0");
             _logger = logger;
         }
 
