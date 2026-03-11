@@ -45,6 +45,8 @@ namespace aspnet_mongo.Controllers
                     using var stream = new MemoryStream();
                     await _telegramBotClient.DownloadFile(fileInfo.FilePath!, stream, cancellationToken);
 
+                    stream.Position = 0;
+
                     var imageBinary = BinaryData.FromStream(stream);
                     var promptMessage = System.IO.File.ReadAllText("Prompts/WhatDoYouSee.txt");
                     var aiChatMessage = new UserChatMessage(
