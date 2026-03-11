@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using aspnet_mongo.Models.Settings;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -12,10 +14,12 @@ namespace aspnet_mongo.Controllers
         private readonly ILogger<CallbackController> _logger;
 
         public CallbackController(
-            //ITelegramBotClient telegramBotClient,
+            IOptions<TelegramIntegrationSettings> options,
             ILogger<CallbackController> logger)
         {
-            _telegramBotClient = new TelegramBotClient("8228945569:AAEkD24cO01thWhv6qJxCbyACbeDdYDfEa0");
+            var telegramSettings = options.Value;
+
+            _telegramBotClient = new TelegramBotClient(telegramSettings.BotToken);
             _logger = logger;
         }
 
