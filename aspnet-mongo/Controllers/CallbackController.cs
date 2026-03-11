@@ -37,27 +37,34 @@ namespace aspnet_mongo.Controllers
             {
                 await _telegramBotClient.SendMessage(message!.Chat.Id, "🧾 Receipt received! Processing...");
 
-                var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId;
-                var fileInfo = await _telegramBotClient.GetFile(fileId!);
+                try
+                {
+                    var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId;
+                    var fileInfo = await _telegramBotClient.GetFile(fileId!);
 
-                using var stream = new MemoryStream();
-                await _telegramBotClient.DownloadFile(fileInfo.FilePath!, stream, cancellationToken);
+                    using var stream = new MemoryStream();
+                    await _telegramBotClient.DownloadFile(fileInfo.FilePath!, stream, cancellationToken);
 
-                var imageBinary = BinaryData.FromStream(stream);
-                var promptMessage = System.IO.File.ReadAllText("Prompts/WhatDoYouSee.txt");
-                var aiChatMessage = new UserChatMessage(
-                    ChatMessageContentPart.CreateTextPart(promptMessage),
-                    ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
-                );
+                    var imageBinary = BinaryData.FromStream(stream);
+                    var promptMessage = System.IO.File.ReadAllText("Prompts/WhatDoYouSee.txt");
+                    var aiChatMessage = new UserChatMessage(
+                        ChatMessageContentPart.CreateTextPart(promptMessage),
+                        ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
+                    );
 
-                var client = GetChatClient();
+                    var client = GetChatClient();
 
-                var completion = await client.CompleteChatAsync(
-                    [aiChatMessage]
-                );
-                var modelAnalysisOutput = completion.Value.Content[0].Text;
+                    var completion = await client.CompleteChatAsync(
+                        [aiChatMessage]
+                    );
+                    var modelAnalysisOutput = completion.Value.Content[0].Text;
 
-                await _telegramBotClient.SendMessage(message!.Chat.Id, $"Here's the output analysis: {modelAnalysisOutput}");
+                    await _telegramBotClient.SendMessage(message!.Chat.Id, $"Here's the output analysis: {modelAnalysisOutput}");
+                }
+                catch (Exception ex)
+                {
+                    await _telegramBotClient.SendMessage(message!.Chat.Id, $"An error occurred: {ex.Message}");
+                }
             }
 
             return Ok();
