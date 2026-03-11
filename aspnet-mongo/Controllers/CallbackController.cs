@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
-using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -38,9 +37,6 @@ namespace aspnet_mongo.Controllers
             {
                 await _telegramBotClient.SendMessage(message!.Chat.Id, "🧾 Receipt received! Processing...");
 
-                var messageSerialized = JsonSerializer.Serialize(message);
-
-                await _telegramBotClient.SendMessage(message!.Chat.Id, $"Here's the object received: {messageSerialized}");
                 var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId;
                 var fileInfo = await _telegramBotClient.GetFile(fileId!);
 
