@@ -32,6 +32,16 @@ namespace aspnet_mongo.Controllers
             if (update.Message is not { } message)
                 return BadRequest($"Error when processing telegram update (null object)");
 
+            // Callback - used to obtain a Telegram payload for further testing (locally)
+
+            if (_openAiSettings.TestMode)
+            {
+                var jsonMessage = System.Text.Json.JsonSerializer.Serialize(message);
+                await _telegramBotClient.SendMessage(message!.Chat.Id, $"Telegram message: {jsonMessage} ");
+
+                return Ok();
+            }
+
             if (message?.Photo != null ||
                 message?.Document != null)
             {
@@ -39,6 +49,7 @@ namespace aspnet_mongo.Controllers
 
                 try
                 {
+                    // Getting file info and downloading it
                     var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId;
                     var fileInfo = await _telegramBotClient.GetFile(fileId!);
 
@@ -48,7 +59,9 @@ namespace aspnet_mongo.Controllers
                     stream.Position = 0;
 
                     var imageBinary = BinaryData.FromStream(stream);
-                    var promptMessage = System.IO.File.ReadAllText("Prompts/WhatDoYouSee.txt");
+
+                    // Sending info to LLM
+                    var promptMessage = System.IO.File.ReadAllText("Prompts/Improved.txt");
                     var aiChatMessage = new UserChatMessage(
                         ChatMessageContentPart.CreateTextPart(promptMessage),
                         ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
