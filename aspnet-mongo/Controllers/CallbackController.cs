@@ -80,7 +80,12 @@ namespace aspnet_mongo.Controllers
                     var modelAnalysisOutput = completion.Value.Content[0].Text;
 
                     if (_openAiSettings.TestMode)
-                        await _telegramBotClient.SendMessage(message!.Chat.Id, modelAnalysisOutput);
+                    {
+                        using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(modelAnalysisOutput));
+                        await _telegramBotClient.SendDocument(
+                            message!.Chat.Id, 
+                            InputFile.FromStream(jsonStream, "receipt_parsed.json"));
+                    }
 
                     //var modelAnalysisOutput = System.IO.File.ReadAllText("Receipts/receipt1.json");
 
@@ -108,10 +113,12 @@ namespace aspnet_mongo.Controllers
 
                     //    await _vendorService.CreateVendor(newVendor, cancellationToken);
                     //}
+                    if (!DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate))
+                        return BadRequest($"Unable to process data. Invalid purchase date: {obtainedReceiptData?.Transaction?.IssueDatetime}");
 
                     var purchase = new Purchase()
                     {
-                        PurchaseDate = DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate) ? purchaseDate : null,
+                        PurchaseDate = purchaseDate,
                         PurchaseUrl = obtainedReceiptData?.QR?.Url,
                         VendorName = vendorName,
                         VendorId = null,
