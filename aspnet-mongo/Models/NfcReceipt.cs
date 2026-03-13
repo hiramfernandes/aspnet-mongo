@@ -132,7 +132,7 @@ namespace aspnet_mongo.Models
         public AccessKeyDecomposed? AccessKeyDecomposed { get; set; }
 
         [JsonPropertyName("issue_datetime")]
-        public DateTime? IssueDatetime { get; set; }
+        public string? IssueDatetime { get; set; }
 
         [JsonPropertyName("authorization_protocol")]
         public string? AuthorizationProtocol { get; set; }
@@ -189,7 +189,7 @@ namespace aspnet_mongo.Models
         public int? ItemsCount { get; set; }
 
         [JsonPropertyName("subtotal")]
-        public int? Subtotal { get; set; }
+        public double? Subtotal { get; set; }
 
         [JsonPropertyName("discount")]
         public object? Discount { get; set; }
@@ -198,7 +198,7 @@ namespace aspnet_mongo.Models
         public object? Surcharge { get; set; }
 
         [JsonPropertyName("total")]
-        public int? Total { get; set; }
+        public double? Total { get; set; }
 
         [JsonPropertyName("currency")]
         public string? Currency { get; set; }
@@ -213,7 +213,7 @@ namespace aspnet_mongo.Models
         public string? Method { get; set; }
 
         [JsonPropertyName("amount")]
-        public int? Amount { get; set; }
+        public double? Amount { get; set; }
 
         [JsonPropertyName("card_brand")]
         public string? CardBrand { get; set; }
@@ -225,19 +225,19 @@ namespace aspnet_mongo.Models
     public class Taxes
     {
         [JsonPropertyName("taxes_total_incidents_displayed")]
-        public object? TaxesTotalIncidentsDisplayed { get; set; }
+        public double? TaxesTotalIncidentsDisplayed { get; set; }
 
         [JsonPropertyName("ibpt_approx")]
-        public IbptApprox IbptApprox { get; set; }
+        public IbptApprox? IbptApprox { get; set; }
     }
 
     public class IbptApprox
     {
         [JsonPropertyName("federal")]
-        public int? Federal { get; set; }
+        public double? Federal { get; set; }
 
         [JsonPropertyName("state")]
-        public int? State { get; set; }
+        public double? State { get; set; }
 
         [JsonPropertyName("source")]
         public string? Source { get; set; }
@@ -264,19 +264,19 @@ namespace aspnet_mongo.Models
         public string? Unit { get; set; }
 
         [JsonPropertyName("unit_price")]
-        public int? UnitPrice { get; set; }
+        public double? UnitPrice { get; set; }
 
         [JsonPropertyName("total_price")]
-        public int? TotalPrice { get; set; }
+        public double? TotalPrice { get; set; }
 
         [JsonPropertyName("discount")]
-        public object Discount { get; set; }
+        public string? Discount { get; set; }
 
         [JsonPropertyName("tags")]
-        public List<string> Tags { get; set; }
+        public List<string>? Tags { get; set; }
 
         [JsonPropertyName("confidence")]
-        public Confidence Confidence { get; set; }
+        public Confidence? Confidence { get; set; }
     }
 
     public class Confidence

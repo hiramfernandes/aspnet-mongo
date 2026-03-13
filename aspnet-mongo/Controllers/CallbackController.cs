@@ -67,7 +67,7 @@ namespace aspnet_mongo.Controllers
                     var imageBinary = BinaryData.FromStream(stream);
 
                     // Sending info to LLM
-                    var promptMessage = System.IO.File.ReadAllText("Prompts/Improved.txt");
+                    var promptMessage = System.IO.File.ReadAllText("Prompts/ImprovedWithNumbers.txt");
                     var aiChatMessage = new UserChatMessage(
                         ChatMessageContentPart.CreateTextPart(promptMessage),
                         ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
@@ -81,6 +81,8 @@ namespace aspnet_mongo.Controllers
 
                     // If this is the full prompt, this returns a json containing all the recepit info
                     var modelAnalysisOutput = completion.Value.Content[0].Text;
+
+                    //var modelAnalysisOutput = System.IO.File.ReadAllText("Receipts/receipt1.json");
 
                     var jsonOptions = new JsonSerializerOptions()
                     {
@@ -109,12 +111,12 @@ namespace aspnet_mongo.Controllers
 
                     var purchase = new Purchase()
                     {
-                        PurchaseDate = obtainedReceiptData?.Transaction?.IssueDatetime,
+                        PurchaseDate = DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate) ? purchaseDate : null,
                         PurchaseUrl = obtainedReceiptData?.QR?.Url,
                         VendorName = vendorName,
                         VendorId = null,
                         TotalAmount = obtainedReceiptData!.Totals?.Total,
-                        Items = obtainedReceiptData!.Items.Select(x => x.DescriptionRaw).ToArray()
+                        Items = obtainedReceiptData!.Items?.Select(x => x.DescriptionRaw ?? string.Empty).ToArray()
                     };
 
                     await _purchaseService.CreateAsync(purchase);
