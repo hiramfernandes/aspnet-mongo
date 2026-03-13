@@ -10,6 +10,7 @@ namespace aspnet_mongo.Services
     {
         Task<IEnumerable<GetVendorDto>> GetAllAsync();
         Task<GetVendorDto> GetById(string id);
+        Task<GetVendorDto?> GetByName(string name);
         Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
         Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken);
         Task RemoveAsync(string id);
@@ -42,6 +43,13 @@ namespace aspnet_mongo.Services
         public async Task<GetVendorDto> GetById(string id)
         {
             var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
+        }
+
+        public async Task<GetVendorDto?> GetByName(string name)
+        {
+            var vendor = await _vendorsCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+
             return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
         }
 

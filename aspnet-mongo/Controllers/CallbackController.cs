@@ -1,9 +1,12 @@
-﻿using aspnet_mongo.Models.Settings;
+﻿using aspnet_mongo.Models;
+using aspnet_mongo.Models.Settings;
+using aspnet_mongo.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
+using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -15,8 +18,10 @@ namespace aspnet_mongo.Controllers
     {
         private readonly TelegramBotClient _telegramBotClient;
         private readonly OpenAiSettings _openAiSettings;
+        private readonly IPurchaseService _purchaseService;
 
         public CallbackController(
+            IPurchaseService purchaseService,
             IOptions<TelegramIntegrationSettings> telegramOptions,
             IOptions<OpenAiSettings> openAiOptions)
         {
@@ -24,6 +29,7 @@ namespace aspnet_mongo.Controllers
 
             _openAiSettings = openAiOptions.Value;
             _telegramBotClient = new TelegramBotClient(telegramSettings.BotToken);
+            _purchaseService = purchaseService;
         }
 
         [HttpPost("telegram")]
@@ -72,9 +78,47 @@ namespace aspnet_mongo.Controllers
                     var completion = await client.CompleteChatAsync(
                         [aiChatMessage]
                     );
+
+                    // If this is the full prompt, this returns a json containing all the recepit info
                     var modelAnalysisOutput = completion.Value.Content[0].Text;
 
-                    await _telegramBotClient.SendMessage(message!.Chat.Id, $"Here's the output analysis: {modelAnalysisOutput}");
+                    var jsonOptions = new JsonSerializerOptions()
+                    {
+                        PropertyNameCaseInsensitive = true,
+                    };
+
+                    var obtainedReceiptData = JsonSerializer.Deserialize<NfcReceipt>(modelAnalysisOutput, jsonOptions);
+
+                    if (obtainedReceiptData == null)
+                        await _telegramBotClient.SendMessage(message!.Chat.Id, "Unable to parse received message");
+
+                    var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
+                    //var vendor = _vendorService.GetByName(vendorName);
+
+                    //if (vendor == null)
+                    //{
+                    //    var newVendor = new CreateVendorDto()
+                    //    {
+                    //        Location = obtainedReceiptData.Merchant?.Address?.City,
+                    //        Name = vendorName,
+                    //        LogoUrl = null
+                    //    };
+
+                    //    await _vendorService.CreateVendor(newVendor, cancellationToken);
+                    //}
+
+                    var purchase = new Purchase()
+                    {
+                        PurchaseDate = obtainedReceiptData?.Transaction?.IssueDatetime,
+                        PurchaseUrl = obtainedReceiptData?.QR?.Url,
+                        VendorName = vendorName,
+                        VendorId = null,
+                        TotalAmount = obtainedReceiptData!.Totals?.Total,
+                        Items = obtainedReceiptData!.Items.Select(x => x.DescriptionRaw).ToArray()
+                    };
+
+                    await _purchaseService.CreateAsync(purchase);
+                    await _telegramBotClient.SendMessage(message!.Chat.Id, $"Successfully persisted NF on purchases");
                 }
                 catch (Exception ex)
                 {
