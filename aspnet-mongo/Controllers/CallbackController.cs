@@ -42,10 +42,8 @@ namespace aspnet_mongo.Controllers
 
             if (_openAiSettings.TestMode)
             {
-                var jsonMessage = System.Text.Json.JsonSerializer.Serialize(message);
+                var jsonMessage = JsonSerializer.Serialize(message);
                 await _telegramBotClient.SendMessage(message!.Chat.Id, $"Telegram message: {jsonMessage} ");
-
-                return Ok();
             }
 
             if (message?.Photo != null ||
@@ -79,8 +77,10 @@ namespace aspnet_mongo.Controllers
                         [aiChatMessage]
                     );
 
-                    // If this is the full prompt, this returns a json containing all the recepit info
                     var modelAnalysisOutput = completion.Value.Content[0].Text;
+
+                    if (_openAiSettings.TestMode)
+                        await _telegramBotClient.SendMessage(message!.Chat.Id, modelAnalysisOutput);
 
                     //var modelAnalysisOutput = System.IO.File.ReadAllText("Receipts/receipt1.json");
 
