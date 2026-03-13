@@ -65,7 +65,7 @@ namespace aspnet_mongo.Controllers
                     var imageBinary = BinaryData.FromStream(stream);
 
                     // Sending info to LLM
-                    var promptMessage = System.IO.File.ReadAllText("Prompts/ImprovedWithNumbers.txt");
+                    var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
                     var aiChatMessage = new UserChatMessage(
                         ChatMessageContentPart.CreateTextPart(promptMessage),
                         ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
@@ -118,7 +118,7 @@ namespace aspnet_mongo.Controllers
 
                     var purchase = new Purchase()
                     {
-                        PurchaseDate = purchaseDate,
+                        PurchaseDate = purchaseDate.Date,
                         PurchaseUrl = obtainedReceiptData?.QR?.Url,
                         VendorName = vendorName,
                         VendorId = null,

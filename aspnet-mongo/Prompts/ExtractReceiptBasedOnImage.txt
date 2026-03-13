@@ -46,7 +46,6 @@ You are a specialized Brazilian NFC-e (Nota Fiscal de Consumidor Eletrônica) da
 Return ONLY a valid JSON object. No prose, no markdown blocks, no explanations. Use null for missing or unreadable fields.
 
 json
-Copy
 {  
   "document_type": "nfce_receipt",  
   "source": {  
