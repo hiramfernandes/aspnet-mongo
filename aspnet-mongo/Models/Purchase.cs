@@ -30,7 +30,22 @@ namespace aspnet_mongo.Models
         public double? TotalAmount { get; set; }
 
         [DataMember]
-        [BsonElement("items")] 
+        [BsonElement("items")]
         public string[]? Items { get; set; }
+    }
+
+    public class PurchaseItem
+    {
+        [DataMember]
+        [BsonElement("description")]
+        public string? Description { get; set; }
+
+        [DataMember]
+        [BsonElement("unitPrice")]
+        public float? UnitPrice { get; set; }
+
+        [DataMember]
+        [BsonElement("tags")]
+        public string[]? Tags { get; set; }
     }
 }
