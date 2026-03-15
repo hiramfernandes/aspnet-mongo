@@ -46,6 +46,27 @@ namespace aspnet_mongo.Controllers
                 await _telegramBotClient.SendMessage(message!.Chat.Id, $"Telegram message: {jsonMessage} ");
             }
 
+            // Url Based info
+            if (message.Text != null)
+            {
+                // TODO
+                // Gotta navigate, get the html raw content and then pass it on to the llm
+                // this way there's no chance of halucation or misguidance on the data
+
+                var url = message.Text;
+                var prompt = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnUrlAndNavigate.txt");
+                var promptWithUrl = prompt.Replace("{{URL}}", url);
+                var modelAnalysisOutput = await SendInfoToLLM(promptWithUrl);
+
+                if (_openAiSettings.TestMode)
+                {
+                    using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(modelAnalysisOutput));
+                    await _telegramBotClient.SendDocument(
+                        message!.Chat.Id,
+                        InputFile.FromStream(jsonStream, "receipt_parsed.json"));
+                }
+            }
+
             if (message?.Photo != null ||
                 message?.Document != null)
             {
@@ -66,18 +87,20 @@ namespace aspnet_mongo.Controllers
 
                     // Sending info to LLM
                     var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
-                    var aiChatMessage = new UserChatMessage(
-                        ChatMessageContentPart.CreateTextPart(promptMessage),
-                        ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
-                    );
+                    var modelAnalysisOutput = await SendInfoToLLM(promptMessage, imageBinary);
 
-                    var client = GetChatClient();
+                    //var aiChatMessage = new UserChatMessage(
+                    //    ChatMessageContentPart.CreateTextPart(promptMessage),
+                    //    ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
+                    //);
 
-                    var completion = await client.CompleteChatAsync(
-                        [aiChatMessage]
-                    );
+                    //var client = GetChatClient();
 
-                    var modelAnalysisOutput = completion.Value.Content[0].Text;
+                    //var completion = await client.CompleteChatAsync(
+                    //    [aiChatMessage]
+                    //);
+
+                    //var modelAnalysisOutput = completion.Value.Content[0].Text;
 
                     if (_openAiSettings.TestMode)
                     {
@@ -155,6 +178,33 @@ namespace aspnet_mongo.Controllers
             var client = openAIClient.GetChatClient(model);
 
             return client;
+        }
+
+        private async Task<string> SendInfoToLLM(
+            string promptMessage, 
+            BinaryData? imageBinary = null)
+        {
+            //var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
+            var aiChatMessage = new UserChatMessage(
+                ChatMessageContentPart.CreateTextPart(promptMessage)
+            );
+
+            if (imageBinary != null)
+            {
+                aiChatMessage.Content.Add(
+                    ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
+                );
+            }
+
+            var client = GetChatClient();
+
+            var completion = await client.CompleteChatAsync(
+                [aiChatMessage]
+            );
+
+            var modelAnalysisOutput = completion.Value.Content[0].Text;
+
+            return modelAnalysisOutput;
         }
     }
 }
