@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Prompts\ExtractReceiptBasedOnHtmlContent.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Prompts\ExtractReceiptBasedOnImage.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

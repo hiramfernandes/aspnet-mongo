@@ -20,16 +20,20 @@ namespace aspnet_mongo.Controllers
         private readonly OpenAiSettings _openAiSettings;
         private readonly IPurchaseService _purchaseService;
 
+        private readonly IHttpClientFactory _httpClientFactory;
+
         public CallbackController(
             IPurchaseService purchaseService,
             IOptions<TelegramIntegrationSettings> telegramOptions,
-            IOptions<OpenAiSettings> openAiOptions)
+            IOptions<OpenAiSettings> openAiOptions,
+            IHttpClientFactory httpClientFactory)
         {
             var telegramSettings = telegramOptions.Value;
 
             _openAiSettings = openAiOptions.Value;
             _telegramBotClient = new TelegramBotClient(telegramSettings.BotToken);
             _purchaseService = purchaseService;
+            _httpClientFactory = httpClientFactory;
         }
 
         [HttpPost("telegram")]
@@ -49,21 +53,45 @@ namespace aspnet_mongo.Controllers
             // Url Based info
             if (message.Text != null)
             {
-                // TODO
-                // Gotta navigate, get the html raw content and then pass it on to the llm
-                // this way there's no chance of halucation or misguidance on the data
-
                 var url = message.Text;
-                var prompt = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnUrlAndNavigate.txt");
-                var promptWithUrl = prompt.Replace("{{URL}}", url);
-                var modelAnalysisOutput = await SendInfoToLLM(promptWithUrl);
-
-                if (_openAiSettings.TestMode)
+                var httpClient = _httpClientFactory.CreateClient("Scraper");
+                try
                 {
-                    using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(modelAnalysisOutput));
-                    await _telegramBotClient.SendDocument(
-                        message!.Chat.Id,
-                        InputFile.FromStream(jsonStream, "receipt_parsed.json"));
+                    using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseContentRead, cancellationToken);
+
+                    response.EnsureSuccessStatusCode();
+
+                    // Return the full HTML string (TODO: Use StringBuilder)
+                    var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<script[^>]*>[\s\S]*?</script>", "");
+                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<style[^>]*>[\s\S]*?</style>", "");
+                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<link[^>]*>[\s\S]*?/>", "");
+                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<meta[^>]*>[\s\S]*?/>", "");
+
+                    var systemPrompt = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnHtmlContent.txt");
+
+                    var userMessage = $"""  
+                        HTML: {htmlContent}  
+                        URL: {url}  
+                        """;
+
+                    var llmResponse = await SendInfoToLlmAsync(systemPrompt, userMessage);
+
+                    if (_openAiSettings.TestMode)
+                    {
+                        using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(llmResponse));
+                        await _telegramBotClient.SendDocument(
+                            message!.Chat.Id,
+                            InputFile.FromStream(jsonStream, "receipt_parsed.json"));
+                    }
+
+                    var nfcReceipt = JsonSerializer.Deserialize<NfcReceipt>(llmResponse);
+
+                    await SavePurchaseAsync(nfcReceipt!, message.Chat.Id, url);
+                }
+                catch (HttpRequestException ex)
+                {
+                    return BadRequest(ex.Message);
                 }
             }
 
@@ -87,7 +115,7 @@ namespace aspnet_mongo.Controllers
 
                     // Sending info to LLM
                     var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
-                    var modelAnalysisOutput = await SendInfoToLLM(promptMessage, imageBinary);
+                    var modelAnalysisOutput = await SendInfoToLlmAsync(promptMessage, imageBinary);
 
                     //var aiChatMessage = new UserChatMessage(
                     //    ChatMessageContentPart.CreateTextPart(promptMessage),
@@ -106,11 +134,9 @@ namespace aspnet_mongo.Controllers
                     {
                         using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(modelAnalysisOutput));
                         await _telegramBotClient.SendDocument(
-                            message!.Chat.Id, 
+                            message!.Chat.Id,
                             InputFile.FromStream(jsonStream, "receipt_parsed.json"));
                     }
-
-                    //var modelAnalysisOutput = System.IO.File.ReadAllText("Receipts/receipt1.json");
 
                     var jsonOptions = new JsonSerializerOptions()
                     {
@@ -119,38 +145,7 @@ namespace aspnet_mongo.Controllers
 
                     var obtainedReceiptData = JsonSerializer.Deserialize<NfcReceipt>(modelAnalysisOutput, jsonOptions);
 
-                    if (obtainedReceiptData == null)
-                        await _telegramBotClient.SendMessage(message!.Chat.Id, "Unable to parse received message");
-
-                    var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
-                    //var vendor = _vendorService.GetByName(vendorName);
-
-                    //if (vendor == null)
-                    //{
-                    //    var newVendor = new CreateVendorDto()
-                    //    {
-                    //        Location = obtainedReceiptData.Merchant?.Address?.City,
-                    //        Name = vendorName,
-                    //        LogoUrl = null
-                    //    };
-
-                    //    await _vendorService.CreateVendor(newVendor, cancellationToken);
-                    //}
-                    if (!DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate))
-                        return BadRequest($"Unable to process data. Invalid purchase date: {obtainedReceiptData?.Transaction?.IssueDatetime}");
-
-                    var purchase = new Purchase()
-                    {
-                        PurchaseDate = purchaseDate.Date,
-                        PurchaseUrl = obtainedReceiptData?.QR?.Url,
-                        VendorName = vendorName,
-                        VendorId = null,
-                        TotalAmount = obtainedReceiptData!.Totals?.Total,
-                        Items = obtainedReceiptData!.Items?.Select(x => x.DescriptionRaw ?? string.Empty).ToArray()
-                    };
-
-                    await _purchaseService.CreateAsync(purchase);
-                    await _telegramBotClient.SendMessage(message!.Chat.Id, $"Successfully persisted NF on purchases");
+                    await SavePurchaseAsync(obtainedReceiptData!, message.Chat.Id);
                 }
                 catch (Exception ex)
                 {
@@ -180,21 +175,15 @@ namespace aspnet_mongo.Controllers
             return client;
         }
 
-        private async Task<string> SendInfoToLLM(
-            string promptMessage, 
-            BinaryData? imageBinary = null)
+        private async Task<string> SendInfoToLlmAsync(
+            string promptMessage,
+            BinaryData imageBinary)
         {
             //var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
             var aiChatMessage = new UserChatMessage(
-                ChatMessageContentPart.CreateTextPart(promptMessage)
+                ChatMessageContentPart.CreateTextPart(promptMessage),
+                ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
             );
-
-            if (imageBinary != null)
-            {
-                aiChatMessage.Content.Add(
-                    ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
-                );
-            }
 
             var client = GetChatClient();
 
@@ -205,6 +194,51 @@ namespace aspnet_mongo.Controllers
             var modelAnalysisOutput = completion.Value.Content[0].Text;
 
             return modelAnalysisOutput;
+        }
+
+        private async Task<string> SendInfoToLlmAsync(
+            string systemPrompt,
+            string userMessage)
+        {
+            var chatMessages = new List<ChatMessage>()
+            {
+                new SystemChatMessage(systemPrompt),
+                new UserChatMessage(userMessage)
+            };
+
+            var client = GetChatClient();
+
+            var response = await client.CompleteChatAsync(
+                chatMessages,
+                new ChatCompletionOptions()
+                {
+                    Temperature = 0
+                }
+            );
+
+            var modelAnalysisOutput = response.Value.Content[0].Text;
+
+            return modelAnalysisOutput;
+        }
+
+        private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, ChatId chatId, string? url = null)
+        {
+            var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
+            
+            DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate);
+
+            var purchase = new Purchase()
+            {
+                PurchaseDate = purchaseDate.Date,
+                PurchaseUrl = url ?? obtainedReceiptData?.QR?.Url,
+                VendorName = vendorName,
+                VendorId = null,
+                TotalAmount = obtainedReceiptData!.Totals?.Total,
+                Items = obtainedReceiptData!.Items?.Select(x => x.DescriptionRaw ?? string.Empty).ToArray()
+            };
+
+            await _purchaseService.CreateAsync(purchase);
+            await _telegramBotClient.SendMessage(chatId, $"Successfully persisted NF on purchases");
         }
     }
 }
