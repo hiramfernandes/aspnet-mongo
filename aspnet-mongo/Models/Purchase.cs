@@ -31,7 +31,7 @@ namespace aspnet_mongo.Models
 
         [DataMember]
         [BsonElement("items")]
-        public string[]? Items { get; set; }
+        public PurchaseItem[]? Items { get; set; }
     }
 
     public class PurchaseItem

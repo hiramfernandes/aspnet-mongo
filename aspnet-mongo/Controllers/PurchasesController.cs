@@ -48,7 +48,13 @@ namespace aspnet_mongo.Controllers
             purchase.VendorName = purchaseDto.VendorName;
             purchase.VendorId = purchaseDto.VendorId;
             purchase.PurchaseUrl = purchaseDto.Url;
-            purchase.Items = purchaseDto.Items;
+            purchase.Items = purchaseDto.Items?
+                .Select(item =>
+                    new PurchaseItem()
+                    {
+                        Description = item
+                    })
+                .ToArray();
             purchase.TotalAmount = purchaseDto.TotalAmount;
 
             await _purchasesService.UpdateAsync(id, purchase);
@@ -67,7 +73,13 @@ namespace aspnet_mongo.Controllers
                 VendorName = newPurchaseDto.VendorName,
                 VendorId = newPurchaseDto.VendorId,
                 TotalAmount = newPurchaseDto.TotalAmount,
-                Items = newPurchaseDto.Items
+                Items = newPurchaseDto.Items?
+                .Select(item =>
+                    new PurchaseItem()
+                    {
+                        Description = item
+                    })
+                .ToArray()
             };
 
             await _purchasesService.CreateAsync(purchase);

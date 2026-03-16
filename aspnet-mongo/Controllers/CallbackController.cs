@@ -234,7 +234,14 @@ namespace aspnet_mongo.Controllers
                 VendorName = vendorName,
                 VendorId = null,
                 TotalAmount = obtainedReceiptData!.Totals?.Total,
-                Items = obtainedReceiptData!.Items?.Select(x => x.DescriptionRaw ?? string.Empty).ToArray()
+                Items = obtainedReceiptData!.Items?.Select(item =>
+                    new PurchaseItem()
+                    {
+                        Description = item.DescriptionRaw,
+                        Tags = item.Tags?.ToArray(),
+                        UnitPrice = (float)item.UnitPrice
+                    }
+                ).ToArray()
             };
 
             await _purchaseService.CreateAsync(purchase);
