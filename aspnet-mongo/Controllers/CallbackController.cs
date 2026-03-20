@@ -91,10 +91,9 @@ namespace aspnet_mongo.Controllers
                 }
             }
 
-            if (message?.Photo != null ||
-                message?.Document != null)
+            if (message?.Photo != null)
             {
-                await _telegramBotClient.SendMessage(message!.Chat.Id, "🧾 Receipt received! Processing...");
+                await _telegramBotClient.SendMessage(message!.Chat.Id, "Image received! Processing...");
 
                 try
                 {
@@ -109,7 +108,18 @@ namespace aspnet_mongo.Controllers
 
                     var imageBinary = BinaryData.FromStream(stream);
 
-                    // Sending info to LLM
+                    // Sending info to LLM - QR Code reader
+                    var qrCodeReaderPromt = await System.IO.File.ReadAllTextAsync("Prompts/ExtractQrCodeBasedOnImage.txt");
+                    var qrDecodingOutput = await SendInfoToLlmAsync(qrCodeReaderPromt, imageBinary);
+
+                    await _telegramBotClient.SendMessage(
+                        message!.Chat.Id,
+                        $"QR Image Analyzer obtained the following info: {qrDecodingOutput}"
+                    );
+
+                    return Ok();
+
+                    // Sending info to LLM - Receipt
                     var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
                     var modelAnalysisOutput = await SendInfoToLlmAsync(promptMessage, imageBinary);
 
