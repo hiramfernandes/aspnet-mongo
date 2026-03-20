@@ -61,12 +61,8 @@ namespace aspnet_mongo.Controllers
 
                     response.EnsureSuccessStatusCode();
 
-                    // Return the full HTML string (TODO: Use StringBuilder)
+                    // Return the full HTML string
                     var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<script[^>]*>[\s\S]*?</script>", "");
-                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<style[^>]*>[\s\S]*?</style>", "");
-                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<link[^>]*>[\s\S]*?/>", "");
-                    //htmlContent = System.Text.RegularExpressions.Regex.Replace(htmlContent, @"<meta[^>]*>[\s\S]*?/>", "");
 
                     var systemPrompt = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnHtmlContent.txt");
 
@@ -116,19 +112,6 @@ namespace aspnet_mongo.Controllers
                     // Sending info to LLM
                     var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
                     var modelAnalysisOutput = await SendInfoToLlmAsync(promptMessage, imageBinary);
-
-                    //var aiChatMessage = new UserChatMessage(
-                    //    ChatMessageContentPart.CreateTextPart(promptMessage),
-                    //    ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
-                    //);
-
-                    //var client = GetChatClient();
-
-                    //var completion = await client.CompleteChatAsync(
-                    //    [aiChatMessage]
-                    //);
-
-                    //var modelAnalysisOutput = completion.Value.Content[0].Text;
 
                     if (_openAiSettings.TestMode)
                     {
@@ -224,8 +207,12 @@ namespace aspnet_mongo.Controllers
         private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, ChatId chatId, string? url = null)
         {
             var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
-            
-            DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate);
+
+            if (!DateTime.TryParse(obtainedReceiptData?.Transaction?.IssueDatetime, out var purchaseDate))
+            {
+                await _telegramBotClient.SendMessage(chatId, $"Error parsing purchase date");
+                return;
+            }
 
             var purchase = new Purchase()
             {
@@ -239,7 +226,7 @@ namespace aspnet_mongo.Controllers
                     {
                         Description = item.DescriptionRaw,
                         Tags = item.Tags?.ToArray(),
-                        UnitPrice = (float)item.UnitPrice
+                        UnitPrice = (float?)item.UnitPrice
                     }
                 ).ToArray()
             };
