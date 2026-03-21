@@ -238,7 +238,8 @@ namespace aspnet_mongo.Controllers
                         Tags = item.Tags?.ToArray(),
                         UnitPrice = (float?)item.UnitPrice
                     }
-                ).ToArray()
+                ).ToArray(),
+                UpdatedAtUtc = DateTime.UtcNow,
             };
 
             await _purchaseService.CreateAsync(purchase);

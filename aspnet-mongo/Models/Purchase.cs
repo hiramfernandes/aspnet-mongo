@@ -32,6 +32,9 @@ namespace aspnet_mongo.Models
         [DataMember]
         [BsonElement("items")]
         public PurchaseItem[]? Items { get; set; }
+
+        [DataMember]
+        public DateTime? UpdatedAtUtc { get; set; }
     }
 
     public class PurchaseItem

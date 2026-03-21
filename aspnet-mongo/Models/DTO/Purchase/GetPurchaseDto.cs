@@ -15,5 +15,13 @@
         public double? TotalAmount { get; set; }
 
         public string? VendorLogoUrl { get; set; }
+        public PurchaseItemDto[]? Items { get; set; }
+    }
+
+    public class PurchaseItemDto
+    {
+        public string? Description { get; set; }
+        public float? UnitPrice { get; set; }
+        public string[]? Tags { get; set; }
     }
 }

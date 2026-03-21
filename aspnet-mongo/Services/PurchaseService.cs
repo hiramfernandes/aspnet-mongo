@@ -72,7 +72,15 @@ namespace aspnet_mongo.Services
                 TotalAmount = purchase.TotalAmount,
                 VendorId = vendor?.Id,
                 VendorName = vendor?.Name,
-                VendorLogoUrl = vendor?.LogoUrl
+                VendorLogoUrl = vendor?.LogoUrl,
+                Items = purchase.Items?.Select(item =>
+                    new PurchaseItemDto()
+                    {
+                        Description = item.Description,
+                        UnitPrice = item.UnitPrice,
+                        Tags = item.Tags
+                    }
+                ).ToArray()
             };
         }
     }

@@ -8,6 +8,6 @@ namespace aspnet_mongo.Models.DTO
         public string? VendorName { get; set; }
         public string? VendorId { get; set; }
         public double? TotalAmount { get; set; }
-        public string[]? Items { get; set; }
+        public PurchaseItemDto[]? Items { get; set; }
     }
 }

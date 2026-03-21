@@ -36,7 +36,7 @@ namespace aspnet_mongo.Controllers
             return Ok(purchase);
         }
 
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePurchase(string id, PurchaseDto purchaseDto)
         {
@@ -52,19 +52,23 @@ namespace aspnet_mongo.Controllers
                 .Select(item =>
                     new PurchaseItem()
                     {
-                        Description = item
+                        Description = item.Description,
+                        UnitPrice = item.UnitPrice,
+                        Tags = item.Tags
                     })
                 .ToArray();
             purchase.TotalAmount = purchaseDto.TotalAmount;
+            purchase.UpdatedAtUtc = DateTime.UtcNow;
 
             await _purchasesService.UpdateAsync(id, purchase);
 
             return Ok(purchase);
         }
 
-
         [HttpPost]
-        public async Task CreatePurchase(CancellationToken cancellationToken, PurchaseDto newPurchaseDto)
+        public async Task CreatePurchase(
+            CancellationToken cancellationToken,
+            PurchaseDto newPurchaseDto)
         {
             var purchase = new Purchase()
             {
@@ -77,9 +81,12 @@ namespace aspnet_mongo.Controllers
                 .Select(item =>
                     new PurchaseItem()
                     {
-                        Description = item
+                        Description = item.Description,
+                        UnitPrice = item.UnitPrice,
+                        Tags = item.Tags
                     })
-                .ToArray()
+                .ToArray(),
+                UpdatedAtUtc = DateTime.UtcNow,
             };
 
             await _purchasesService.CreateAsync(purchase);
