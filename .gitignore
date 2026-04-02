@@ -18,3 +18,4 @@ x64/
 /aspnet-mongo/appsettings.Development.json
 *.user
 *.bin
+/src/aspnet-mongo/appsettings.Development.json
