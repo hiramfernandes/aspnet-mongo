@@ -1,25 +1,17 @@
 ﻿using aspnet_mongo.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Purchases.Application.Contracts;
 using Purchases.Application.Models.DTO.Vendor;
 using Purchases.Application.Models.Settings;
 
 namespace Purchases.Application.Services
 {
-    public interface IVendorService
-    {
-        Task<IEnumerable<GetVendorDto>> GetAllAsync();
-        Task<GetVendorDto> GetById(string id);
-        Task<GetVendorDto?> GetByName(string name);
-        Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
-        Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken);
-        Task RemoveAsync(string id);
-    }
-
     public class VendorService : IVendorService
     {
 
         private readonly string _collectionName = "vendors";
+
         private readonly IMongoCollection<Vendor> _vendorsCollection;
 
         public VendorService(IOptions<MongoDbSettings> databaseSettings)

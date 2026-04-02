@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Purchases.Application.Contracts;
 using Purchases.Application.Models;
 using Purchases.Application.Models.DTO.Purchase;
 using Purchases.Application.Models.DTO.Vendor;
@@ -7,15 +8,6 @@ using Purchases.Application.Models.Settings;
 
 namespace Purchases.Application.Services
 {
-    public interface IPurchaseService
-    {
-        Task CreateAsync(Purchase newPurchase);
-        Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50);
-        Task<Purchase?> GetAsync(string id);
-        Task RemoveAsync(string id);
-        Task UpdateAsync(string id, Purchase updatedPurchase);
-    }
-
     public class PurchaseService : IPurchaseService
     {
         private readonly string _collectionName = "purchases";
@@ -26,14 +18,13 @@ namespace Purchases.Application.Services
         public PurchaseService(IOptions<MongoDbSettings> databaseSettings, IVendorService vendorService)
         {
             var connectionString = databaseSettings.Value.ConnectionString;
-            var collectionName = databaseSettings.Value.CollectionName;
             var dbName = databaseSettings.Value.DatabaseName;
 
             var mongoClient = new MongoClient(connectionString);
             var mongoDatabase = mongoClient.GetDatabase(dbName);
 
             _vendorService = vendorService;
-            _purchasesCollection = mongoDatabase.GetCollection<Purchase>(collectionName);
+            _purchasesCollection = mongoDatabase.GetCollection<Purchase>(_collectionName);
         }
 
         public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50)

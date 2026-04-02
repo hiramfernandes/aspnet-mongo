@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Purchases.Application.Contracts;
 using Purchases.Application.Models;
 using Purchases.Application.Models.DTO.Purchase;
-using Purchases.Application.Services;
 
 namespace aspnet_mongo.Controllers
 {
