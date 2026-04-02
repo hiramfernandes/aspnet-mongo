@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace aspnet_mongo.Models
+namespace Purchases.Application.Models
 {
     public class NfcReceipt
     {

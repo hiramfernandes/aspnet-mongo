@@ -1,5 +1,5 @@
-using aspnet_mongo.Models.Settings;
-using aspnet_mongo.Services;
+using Purchases.Application.Models.Settings;
+using Purchases.Application.Services;
 
 namespace aspnet_mongo
 {

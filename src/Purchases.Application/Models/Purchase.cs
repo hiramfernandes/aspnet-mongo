@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using System.Runtime.Serialization;
 
-namespace aspnet_mongo.Models
+namespace Purchases.Application.Models
 {
     [BsonIgnoreExtraElements]
     public class Purchase

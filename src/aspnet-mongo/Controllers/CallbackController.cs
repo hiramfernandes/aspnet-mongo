@@ -1,10 +1,10 @@
-﻿using aspnet_mongo.Models;
-using aspnet_mongo.Models.Settings;
-using aspnet_mongo.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
+using Purchases.Application.Models;
+using Purchases.Application.Models.Settings;
+using Purchases.Application.Services;
 using System.ClientModel;
 using System.Text.Json;
 using Telegram.Bot;

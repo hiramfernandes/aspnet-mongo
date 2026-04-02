@@ -1,4 +1,4 @@
-﻿namespace aspnet_mongo.Models.Settings
+﻿namespace Purchases.Application.Models.Settings
 {
     public class OpenAiSettings
     {

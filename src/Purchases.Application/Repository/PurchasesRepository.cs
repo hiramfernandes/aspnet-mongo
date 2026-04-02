@@ -1,6 +1,7 @@
 ﻿using aspnet_mongo.Models;
+using Purchases.Application.Models;
 
-namespace aspnet_mongo.Repository
+namespace Purchases.Application.Repository
 {
     public class PurchasesRepository
     {

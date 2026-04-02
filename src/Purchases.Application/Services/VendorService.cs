@@ -1,10 +1,10 @@
 ﻿using aspnet_mongo.Models;
-using aspnet_mongo.Models.DTO;
-using aspnet_mongo.Models.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Purchases.Application.Models.DTO.Vendor;
+using Purchases.Application.Models.Settings;
 
-namespace aspnet_mongo.Services
+namespace Purchases.Application.Services
 {
     public interface IVendorService
     {

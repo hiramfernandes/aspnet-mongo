@@ -1,4 +1,4 @@
-﻿namespace aspnet_mongo.Models.DTO
+﻿namespace Purchases.Application.Models.DTO.Vendor
 {
     public class CreateVendorDto
     {
