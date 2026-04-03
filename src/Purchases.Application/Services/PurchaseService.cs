@@ -1,40 +1,30 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Purchases.Application.Contracts;
 using Purchases.Application.Models;
 using Purchases.Application.Models.DTO.Purchase;
 using Purchases.Application.Models.DTO.Vendor;
-using Purchases.Application.Models.Settings;
+using Purchases.Application.Repository;
 
 namespace Purchases.Application.Services
 {
     public class PurchaseService : IPurchaseService
     {
-        private readonly string _collectionName = "purchases";
-
-        private readonly IMongoCollection<Purchase> _purchasesCollection;
+        private readonly IPurchasesRepository _purchasesRepository;
         private readonly IVendorService _vendorService;
 
-        public PurchaseService(IOptions<MongoDbSettings> databaseSettings, IVendorService vendorService)
+        public PurchaseService(
+            IPurchasesRepository purchasesRepository,
+            IVendorService vendorService)
         {
-            var connectionString = databaseSettings.Value.ConnectionString;
-            var dbName = databaseSettings.Value.DatabaseName;
-
-            var mongoClient = new MongoClient(connectionString);
-            var mongoDatabase = mongoClient.GetDatabase(dbName);
-
+            _purchasesRepository = purchasesRepository;
             _vendorService = vendorService;
-            _purchasesCollection = mongoDatabase.GetCollection<Purchase>(_collectionName);
         }
 
         public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50)
         {
-            var queryableCollection = _purchasesCollection.AsQueryable();
-            var purchases = queryableCollection
-                .OrderByDescending(x => x.PurchaseDate)
-                .Take(pageSize)
-                .ToList();
+            var purchases = await _purchasesRepository.GetAllAsync(pageSize);
 
+            // TODO: Optimize vendors retrieval
             var vendors = await _vendorService.GetAllAsync();
             var purchaseDtos = purchases.Select(purchase => MapFrom(purchase, vendors));
 
@@ -42,16 +32,16 @@ namespace Purchases.Application.Services
         }
 
         public async Task<Purchase?> GetAsync(string id) =>
-            await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            await _purchasesRepository.GetAsync(id);
 
         public async Task CreateAsync(Purchase newPurchase) =>
-            await _purchasesCollection.InsertOneAsync(newPurchase);
+            await _purchasesRepository.CreateAsync(newPurchase);
 
         public async Task UpdateAsync(string id, Purchase updatedPurchase) =>
-            await _purchasesCollection.ReplaceOneAsync(x => x.Id == id, updatedPurchase);
+            await _purchasesRepository.UpdateAsync(id, updatedPurchase);
 
         public async Task RemoveAsync(string id) =>
-            await _purchasesCollection.DeleteOneAsync(x => x.Id == id);
+            await _purchasesRepository.RemoveAsync(id);
 
         private GetPurchaseDto MapFrom(Purchase purchase, IEnumerable<GetVendorDto> vendors)
         {

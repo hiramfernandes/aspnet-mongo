@@ -1,5 +1,6 @@
 using Purchases.Application.Contracts;
 using Purchases.Application.Models.Settings;
+using Purchases.Application.Repository;
 using Purchases.Application.Services;
 
 namespace aspnet_mongo
@@ -36,6 +37,7 @@ namespace aspnet_mongo
             builder.Services.AddScoped<IPurchaseService, PurchaseService>();
             builder.Services.AddScoped<IVendorService, VendorService>();
             builder.Services.AddScoped<IReceiptRetrieverService, ReceiptRetrieverService>();
+            builder.Services.AddScoped<IPurchasesRepository, PurchasesRepository>();
 
             builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
             builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));
