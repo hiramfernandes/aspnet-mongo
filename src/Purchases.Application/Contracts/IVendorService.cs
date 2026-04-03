@@ -6,9 +6,9 @@ namespace Purchases.Application.Contracts
     {
         Task<IEnumerable<GetVendorDto>> GetAllAsync();
         Task<GetVendorDto> GetById(string id);
-        Task<GetVendorDto?> GetByName(string name);
+        Task<GetVendorDto?> GetByName(string name, CancellationToken cancellationToken);
         Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
         Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken);
-        Task RemoveAsync(string id);
+        Task RemoveAsync(string id, CancellationToken cancellationToken);
     }
 }

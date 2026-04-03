@@ -1,46 +1,36 @@
 ﻿using aspnet_mongo.Models;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Purchases.Application.Contracts;
 using Purchases.Application.Models.DTO.Vendor;
-using Purchases.Application.Models.Settings;
+using Purchases.Application.Repository;
 
 namespace Purchases.Application.Services
 {
     public class VendorService : IVendorService
     {
+        private readonly IVendorRepository _vendorRepository;
 
-        private readonly string _collectionName = "vendors";
-
-        private readonly IMongoCollection<Vendor> _vendorsCollection;
-
-        public VendorService(IOptions<MongoDbSettings> databaseSettings)
+        public VendorService(IVendorRepository vendorRepository)
         {
-            var connectionString = databaseSettings.Value.ConnectionString;
-            var dbName = databaseSettings.Value.DatabaseName;
-
-            var mongoClient = new MongoClient(connectionString);
-            var mongoDatabase = mongoClient.GetDatabase(dbName);
-
-            _vendorsCollection = mongoDatabase.GetCollection<Vendor>(_collectionName);
+            _vendorRepository = vendorRepository;
         }
 
         public async Task<IEnumerable<GetVendorDto>> GetAllAsync()
         {
-            var vendors = await _vendorsCollection.Find(_ => true).ToListAsync();
+            var vendors = await _vendorRepository.GetAllAsync();
 
             return vendors.Select(x => new GetVendorDto { Id = x.Id, Name = x.Name, LogoUrl = x.LogoUrl });
         }
 
         public async Task<GetVendorDto> GetById(string id)
         {
-            var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var vendor = await _vendorRepository.GetAsync(id);
             return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
         }
 
-        public async Task<GetVendorDto?> GetByName(string name)
+        public async Task<GetVendorDto?> GetByName(string name, CancellationToken cancellationToken)
         {
-            var vendor = await _vendorsCollection.Find(x => x.Name == name).FirstOrDefaultAsync();
+            var vendor = await _vendorRepository.GetByNameAsync(name, cancellationToken);
 
             return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
         }
@@ -56,18 +46,12 @@ namespace Purchases.Application.Services
                 UpdatedOn = DateTime.Now
             };
 
-            InsertOneOptions options = new InsertOneOptions
-            {
-                BypassDocumentValidation = false,
-                Comment = "Added using asp.net backend"
-            };
-
-            await _vendorsCollection.InsertOneAsync(vendor, options, cancellationToken);
+            await _vendorRepository.CreateAsync(vendor, cancellationToken);
         }
 
         public async Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken)
         {
-            var vendor = await _vendorsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            var vendor = await _vendorRepository.GetAsync(id);
             if (vendor == null)
                 throw new InvalidOperationException($"Vendor with Id {id} does not exist");
 
@@ -75,10 +59,10 @@ namespace Purchases.Application.Services
             vendor.Name = updateVendorDto.Name;
             vendor.UpdatedOn = DateTime.Now;
 
-            await _vendorsCollection.ReplaceOneAsync(x => x.Id == id, vendor);
+            await _vendorRepository.UpdateVendor(id, vendor, cancellationToken);
         }
 
-        public async Task RemoveAsync(string id) =>
-            await _vendorsCollection.DeleteOneAsync(x => x.Id == id);
+        public async Task RemoveAsync(string id, CancellationToken cancellationToken) =>
+            await _vendorRepository.RemoveAsync(id, cancellationToken);
     }
 }

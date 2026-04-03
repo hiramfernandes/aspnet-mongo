@@ -22,7 +22,9 @@ namespace aspnet_mongo.Controllers
         [Produces(typeof(List<GetPurchaseDto>))]
         public async Task<IActionResult> GetPurchases(CancellationToken cancellationToken)
         {
-            var purchases = await _purchasesService.GetAllAsync();
+            var pageSize = 50;
+
+            var purchases = await _purchasesService.GetAllAsync(pageSize, cancellationToken);
 
             return Ok(purchases);
         }
@@ -31,16 +33,16 @@ namespace aspnet_mongo.Controllers
         [Produces(typeof(Purchase))]
         public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken)
         {
-            var purchase = await _purchasesService.GetAsync(id);
+            var purchase = await _purchasesService.GetAsync(id, cancellationToken);
 
             return Ok(purchase);
         }
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePurchase(string id, PurchaseDto purchaseDto)
+        public async Task<IActionResult> UpdatePurchase(string id, PurchaseDto purchaseDto, CancellationToken cancellationToken)
         {
-            var purchase = await _purchasesService.GetAsync(id);
+            var purchase = await _purchasesService.GetAsync(id, cancellationToken);
             if (purchase == null)
                 return BadRequest("Unable to find purchase");
 

@@ -9,20 +9,20 @@ namespace Purchases.Application.Services
 {
     public class PurchaseService : IPurchaseService
     {
-        private readonly IPurchasesRepository _purchasesRepository;
+        private readonly IPurchaseRepository _purchaseRepository;
         private readonly IVendorService _vendorService;
 
         public PurchaseService(
-            IPurchasesRepository purchasesRepository,
+            IPurchaseRepository purchaseRepository,
             IVendorService vendorService)
         {
-            _purchasesRepository = purchasesRepository;
+            _purchaseRepository = purchaseRepository;
             _vendorService = vendorService;
         }
 
-        public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize = 50)
+        public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize, CancellationToken cancellationToken)
         {
-            var purchases = await _purchasesRepository.GetAllAsync(pageSize);
+            var purchases = await _purchaseRepository.GetAllAsync(pageSize, cancellationToken);
 
             // TODO: Optimize vendors retrieval
             var vendors = await _vendorService.GetAllAsync();
@@ -31,17 +31,17 @@ namespace Purchases.Application.Services
             return purchaseDtos;
         }
 
-        public async Task<Purchase?> GetAsync(string id) =>
-            await _purchasesRepository.GetAsync(id);
+        public async Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken) =>
+            await _purchaseRepository.GetAsync(id, cancellationToken);
 
         public async Task CreateAsync(Purchase newPurchase) =>
-            await _purchasesRepository.CreateAsync(newPurchase);
+            await _purchaseRepository.CreateAsync(newPurchase);
 
         public async Task UpdateAsync(string id, Purchase updatedPurchase) =>
-            await _purchasesRepository.UpdateAsync(id, updatedPurchase);
+            await _purchaseRepository.UpdateAsync(id, updatedPurchase);
 
         public async Task RemoveAsync(string id) =>
-            await _purchasesRepository.RemoveAsync(id);
+            await _purchaseRepository.RemoveAsync(id);
 
         private GetPurchaseDto MapFrom(Purchase purchase, IEnumerable<GetVendorDto> vendors)
         {

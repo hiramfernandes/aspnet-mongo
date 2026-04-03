@@ -33,11 +33,14 @@ namespace aspnet_mongo
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // Dependency Injection Setup
+            // Dependency Injection Setup for Services
             builder.Services.AddScoped<IPurchaseService, PurchaseService>();
             builder.Services.AddScoped<IVendorService, VendorService>();
             builder.Services.AddScoped<IReceiptRetrieverService, ReceiptRetrieverService>();
-            builder.Services.AddScoped<IPurchasesRepository, PurchasesRepository>();
+
+            // DI for Repos
+            builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+            builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
             builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
             builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));

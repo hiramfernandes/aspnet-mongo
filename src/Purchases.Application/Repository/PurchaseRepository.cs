@@ -6,22 +6,22 @@ using Purchases.Application.Models.Settings;
 
 namespace Purchases.Application.Repository
 {
-    public interface IPurchasesRepository
+    public interface IPurchaseRepository
     {
-        Task<IEnumerable<Purchase>> GetAllAsync(int pageSize = 50);
-        Task<Purchase?> GetAsync(string id);
+        Task<IEnumerable<Purchase>> GetAllAsync(int pageSize, CancellationToken cancellationToken);
+        Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken);
         Task CreateAsync(Purchase newPurchase);
         Task RemoveAsync(string id);
         Task UpdateAsync(string id, Purchase updatedPurchase);
     }
 
-    public class PurchasesRepository : IPurchasesRepository
+    public class PurchaseRepository : IPurchaseRepository
     {
         private readonly IMongoCollection<Purchase> _purchasesCollection;
 
         private readonly string _collectionName = "purchases";
 
-        public PurchasesRepository(IOptions<MongoDbSettings> databaseSettings)
+        public PurchaseRepository(IOptions<MongoDbSettings> databaseSettings)
         {
             var connectionString = databaseSettings.Value.ConnectionString;
             var dbName = databaseSettings.Value.DatabaseName;
@@ -32,17 +32,17 @@ namespace Purchases.Application.Repository
             _purchasesCollection = mongoDatabase.GetCollection<Purchase>(_collectionName);
         }
 
-        public async Task<IEnumerable<Purchase>> GetAllAsync(int pageSize = 50)
+        public async Task<IEnumerable<Purchase>> GetAllAsync(int pageSize, CancellationToken cancellationToken)
         {
             var queryableCollection = _purchasesCollection.AsQueryable();
             return await queryableCollection
                 .OrderByDescending(x => x.PurchaseDate)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<Purchase?> GetAsync(string id) =>
-            await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        public async Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken) =>
+            await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
         public async Task CreateAsync(Purchase newPurchase) =>
             await _purchasesCollection.InsertOneAsync(newPurchase);
