@@ -5,6 +5,7 @@ using Purchases.Application.Contracts;
 using Purchases.Application.Models;
 using Purchases.Application.Models.Settings;
 using System.ClientModel;
+using System.Text;
 using System.Text.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -32,6 +33,46 @@ namespace Purchases.Application.Services
             _telegramBotClient = new TelegramBotClient(telegramSettings.BotToken);
         }
 
+        public async Task ProcessTelegramMessage(Update update, CancellationToken cancellationToken)
+        {
+            if (update.Message is not { } message)
+                throw new InvalidOperationException($"Error when processing telegram update (null object)");
+
+            //return BadRequest($"Error when processing telegram update (null object)");
+
+            if (_openAiSettings.TestMode)
+            {
+                var jsonMessage = JsonSerializer.Serialize(message);
+                await _telegramBotClient.SendMessage(message!.Chat.Id, $"Telegram message: {jsonMessage} ");
+            }
+
+            try
+            {
+
+                // TODO: Create factory to determine whether consume url or image/QR
+
+                // Url Based info
+                if (message.Text != null)
+                {
+                    var url = message.Text;
+                    await HandleReceiptUrl(url, message!.Chat.Id, cancellationToken);
+                } 
+                else if (message?.Photo != null)
+                {
+                    await _telegramBotClient.SendMessage(message!.Chat.Id, "Image received! Processing...");
+
+                    var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId ?? throw new Exception("File not found");
+                    await HandleQrCode(fileId, message!.Chat.Id, cancellationToken);
+
+                    // await HandleImage(fileId, message!.Chat.Id, cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _telegramBotClient.SendMessage(message!.Chat.Id, $"An error occurred: {ex.Message}");
+            }
+        }
+
         public async Task HandleReceiptUrl(string url, long messageId, CancellationToken cancellationToken)
         {
             var httpClient = _httpClientFactory.CreateClient("Scraper");
@@ -42,7 +83,7 @@ namespace Purchases.Application.Services
             // Return the full HTML string
             var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            var systemPrompt = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnHtmlContent.txt");
+            var systemPrompt = File.ReadAllText("Prompts/ExtractReceiptBasedOnHtmlContent.txt");
 
             var userMessage = $"""  
                         HTML: {htmlContent}  
@@ -53,7 +94,7 @@ namespace Purchases.Application.Services
 
             if (_openAiSettings.TestMode)
             {
-                using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(llmResponse));
+                using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(llmResponse));
                 await _telegramBotClient.SendDocument(
                     messageId,
                     InputFile.FromStream(jsonStream, "receipt_parsed.json"));
@@ -70,7 +111,7 @@ namespace Purchases.Application.Services
             var imageBinary = await GetImageBinaryData(fileId, cancellationToken);
 
             // Sending info to LLM - QR Code reader
-            var qrCodeReaderPromt = await System.IO.File.ReadAllTextAsync("Prompts/ExtractQrCodeBasedOnImage.txt");
+            var qrCodeReaderPromt = await File.ReadAllTextAsync("Prompts/ExtractQrCodeBasedOnImage.txt");
             var qrDecodingOutput = await SendInfoToLlmAsync(qrCodeReaderPromt, imageBinary);
 
             await _telegramBotClient.SendMessage(
@@ -84,12 +125,12 @@ namespace Purchases.Application.Services
             // Sending info to LLM - Receipt
             var imageBinary = await GetImageBinaryData(fileId, cancellationToken);
 
-            var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
+            var promptMessage = File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
             var modelAnalysisOutput = await SendInfoToLlmAsync(promptMessage, imageBinary);
 
             if (_openAiSettings.TestMode)
             {
-                using var jsonStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(modelAnalysisOutput));
+                using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(modelAnalysisOutput));
                 await _telegramBotClient.SendDocument(
                     chatMessageId,
                     InputFile.FromStream(jsonStream, "receipt_parsed.json"));
@@ -109,7 +150,6 @@ namespace Purchases.Application.Services
             string promptMessage,
             BinaryData imageBinary)
         {
-            //var promptMessage = System.IO.File.ReadAllText("Prompts/ExtractReceiptBasedOnImage.txt");
             var aiChatMessage = new UserChatMessage(
                 ChatMessageContentPart.CreateTextPart(promptMessage),
                 ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
