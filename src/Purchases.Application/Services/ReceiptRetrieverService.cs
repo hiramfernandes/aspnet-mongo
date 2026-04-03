@@ -38,8 +38,6 @@ namespace Purchases.Application.Services
             if (update.Message is not { } message)
                 throw new InvalidOperationException($"Error when processing telegram update (null object)");
 
-            //return BadRequest($"Error when processing telegram update (null object)");
-
             if (_openAiSettings.TestMode)
             {
                 var jsonMessage = JsonSerializer.Serialize(message);
@@ -48,24 +46,7 @@ namespace Purchases.Application.Services
 
             try
             {
-
-                // TODO: Create factory to determine whether consume url or image/QR
-
-                // Url Based info
-                if (message.Text != null)
-                {
-                    var url = message.Text;
-                    await HandleReceiptUrl(url, message!.Chat.Id, cancellationToken);
-                } 
-                else if (message?.Photo != null)
-                {
-                    await _telegramBotClient.SendMessage(message!.Chat.Id, "Image received! Processing...");
-
-                    var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId ?? throw new Exception("File not found");
-                    await HandleQrCode(fileId, message!.Chat.Id, cancellationToken);
-
-                    // await HandleImage(fileId, message!.Chat.Id, cancellationToken);
-                }
+                await TelegramServiceFactory(message, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -73,6 +54,7 @@ namespace Purchases.Application.Services
             }
         }
 
+        #region Receipt Handling
         public async Task HandleReceiptUrl(string url, long messageId, CancellationToken cancellationToken)
         {
             var httpClient = _httpClientFactory.CreateClient("Scraper");
@@ -145,6 +127,9 @@ namespace Purchases.Application.Services
 
             await SavePurchaseAsync(obtainedReceiptData!, chatMessageId);
         }
+        #endregion Receipt Handling
+
+        #region LLM Processing
 
         private async Task<string> SendInfoToLlmAsync(
             string promptMessage,
@@ -209,6 +194,7 @@ namespace Purchases.Application.Services
 
             return client;
         }
+        #endregion LLM Processing
 
         private async Task<BinaryData> GetImageBinaryData(string fileId, CancellationToken cancellationToken)
         {
@@ -252,6 +238,32 @@ namespace Purchases.Application.Services
 
             await _purchaseService.CreateAsync(purchase);
             await _telegramBotClient.SendMessage(chatId, $"Successfully persisted NF on purchases");
+        }
+
+        // TODO: Create actual factory returning instances of processors for each choice
+        private async Task TelegramServiceFactory(Message message, CancellationToken cancellationToken)
+        {
+            var useQrCodeAsImageProcessor = true;
+
+            if (message.Text != null)
+            {
+                var url = message.Text;
+                await HandleReceiptUrl(url, message!.Chat.Id, cancellationToken);
+            }
+            else if (message?.Photo != null)
+            {
+                await _telegramBotClient.SendMessage(message!.Chat.Id, "Image received! Processing...");
+
+                var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId ?? throw new Exception("File not found");
+                if (useQrCodeAsImageProcessor)
+                {
+                    await HandleQrCode(fileId, message!.Chat.Id, cancellationToken);
+                }
+                else
+                {
+                    await HandleImage(fileId, message!.Chat.Id, cancellationToken);
+                }
+            }
         }
     }
 }
