@@ -62,6 +62,11 @@ namespace Purchases.Application.Services
 
             response.EnsureSuccessStatusCode();
 
+            if (_openAiSettings.TestMode)
+            {
+                await _telegramBotClient.SendMessage(messageId, "URL content retrieved. Processing...");
+            }
+
             // Return the full HTML string
             var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -248,6 +253,8 @@ namespace Purchases.Application.Services
             if (message.Text != null)
             {
                 var url = message.Text;
+                await _telegramBotClient.SendMessage(message!.Chat.Id, $"URL Received: {url} ");
+                
                 await HandleReceiptUrl(url, message!.Chat.Id, cancellationToken);
             }
             else if (message?.Photo != null)
