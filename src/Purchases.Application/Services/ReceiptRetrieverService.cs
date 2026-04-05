@@ -44,14 +44,7 @@ namespace Purchases.Application.Services
                 await _telegramBotClient.SendMessage(message!.Chat.Id, $"Telegram message: {jsonMessage} ");
             }
 
-            try
-            {
-                await TelegramServiceFactory(message, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                await _telegramBotClient.SendMessage(message!.Chat.Id, $"An error occurred: {ex.Message}");
-            }
+            await TelegramServiceFactory(message, cancellationToken);
         }
 
         #region Receipt Handling
