@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Purchases.Application.Contracts;
 using Telegram.Bot.Types;
 
 namespace aspnet_mongo.Controllers
 {
     [ApiController]
-    [AllowAnonymous]
     [Route("api/[controller]")]
     public class CallbackController : ControllerBase
     {
@@ -24,7 +22,7 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
-                //await _receiptRetrieverService.ProcessTelegramMessage(update, cancellationToken);
+                await _receiptRetrieverService.ProcessTelegramMessage(update, cancellationToken);
                 return Ok();
             }
             catch (Exception exc)

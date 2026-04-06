@@ -59,7 +59,7 @@ namespace aspnet_mongo
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.MapControllers();
             app.UseRouting();
             app.UseCors(allowedOriginsPolicyName);
