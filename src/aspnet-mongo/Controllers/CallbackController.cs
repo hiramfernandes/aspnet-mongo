@@ -22,7 +22,7 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
-                await _receiptRetrieverService.ProcessTelegramMessage(update, cancellationToken);
+                //await _receiptRetrieverService.ProcessTelegramMessage(update, cancellationToken);
                 return Ok();
             }
             catch (Exception exc)
