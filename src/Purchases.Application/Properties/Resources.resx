@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ExtractReceiptBasedOnUrlInfo" xml:space="preserve">
+    <value>You are an information extraction and classification engine for Brazilian NFC-e ("Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica") consultation pages.
+
+Input: a single URL to an NFC-e QR/consultation page, like: {{URL}}
+
+Task:
+
+    Open the URL and extract all available receipt data: merchant identification, address, NFC-e number/series, access key, issue datetime, authorization protocol, environment, items (description, product code, quantity, unit, unit price, total price), totals (items count, total amount), payments (method and amount), and taxes (total displayed; IBPT approx federal/state if present).
+    Normalize and output ONLY a single JSON object matching the schema below exactly (same keys, same nesting). Use null where the page does not provide the value. Use decimal numbers with a dot.
+    Populate:
+        qr.decoded_ok = true and qr.url = {{URL}} if the page is accessible.
+        source.notes must include the source URL.
+    Tagging requirements (broad retail coverage)
+        Add purchase_tags (array of strings) at the top level (new field) summarizing the purchase overall.
+        For each item, set items[].tags to meaningful tags inferred from description_raw.
+        Tags must be lowercase snake_case, short, reusable.
+        Prefer the controlled vocabulary below, but you may create new tags when needed for non-grocery domains (tools, electronics, services, etc.). When creating new tags, keep them generic (category-level), not brand- or store-specific.
+        If uncertain, include "unknown".
+
+Controlled tag vocabulary (prefer these first):
+
+    groceries, food, beverage, alcohol, meat, poultry, seafood, dairy, cheese, deli_meat, bakery, sweets, snacks, pantry, canned_food, frozen, produce
+    household, cleaning, paper_goods, kitchenware, cutlery, tableware, home_textiles, furniture, decor
+    clothing, footwear, accessories
+    personal_care, health, pharmacy, baby, pets
+    electronics, appliances, computing, phone_accessories
+    tools, hardware, construction, automotive, gardening
+    stationery, books, toys, sports, hobbies
+    services, digital_goods, subscription, delivery_fee, warranty, installation
+    restaurant, fuel
+    unknown
+
+Tagging logic:
+
+    Assign 1–4 tags per item based on keywords and context (e.g., "martelo" → tools, hardware; "pilha" → electronics; "corte de cabelo" → services, personal_care; "taxa/entrega" → services, delivery_fee).
+    purchase_tags should summarize the overall basket:
+        include "nfce_receipt" always
+        include the top 3–6 categories represented across items (by count and/or share of total value)
+        if items span multiple domains, include multiple tags (e.g., groceries, household, clothing)
+
+Output constraints:
+
+    Output must be valid JSON only (no markdown, no explanation).
+    Keep original raw strings as shown on the receipt for description_raw and product_code_raw.
+    issue_datetime must be ISO-8601 with timezone if you can infer it; otherwise null.
+    environment should be "producao" if the page says "Ambiente de Produção"; otherwise null.
+    access_key_decomposed:
+        cUF = first 2 digits of the 44-digit key
+        AAMM = digits 3–6
+        cnpj_digits = CNPJ digits only (14 digits) if present in the key or merchant section
+        nNF = NFC-e number if present
+    The items array must contain one object per line item on the receipt. Do not merge or skip items.
+    confidence values should reflect your certainty: use 1.0 if the value was clearly stated on the page, lower values (e.g. 0.7) if inferred or ambiguous.
+    Your entire response must be the raw JSON object only. Do not wrap it in markdown code fences (no triple backticks, no ```json), do not add any text before or after the JSON. Start your response with { and end with }.
+
+Output schema (follow exactly):
+
+{
+  "document_type": "nfce_receipt",  
+  "purchase_tags": [],  
+  "source": {  
+    "source_type": "receipt_url",  
+    "image_file": null,  
+    "ingested_at": null,  
+    "notes": []  
+  },  
+  "qr": {  
+    "decoded_ok": false,  
+    "url": null,  
+    "fallback_used": false,  
+    "fallback_source": null  
+  },  
+  "merchant": {  
+    "legal_name": null,  
+    "cnpj": null,  
+    "address": {  
+      "street": null,  
+      "number": null,  
+      "neighborhood": null,  
+      "city": null,  
+      "state": null,  
+      "country": "BR"  
+    }  
+  },  
+  "transaction": {  
+    "model": "65",  
+    "nfce_number": null,  
+    "series": null,  
+    "access_key_44": null,  
+    "access_key_decomposed": {  
+      "cUF": null,  
+      "AAMM": null,  
+      "cnpj_digits": null,  
+      "nNF": null  
+    },  
+    "issue_datetime": null,  
+    "authorization_protocol": null,  
+    "environment": null  
+  },  
+  "totals": {  
+    "items_count": null,  
+    "total": null,  
+    "currency": "BRL",  
+    "payment": [  
+      {  
+        "method": null,  
+        "amount": null  
+      }  
+    ]  
+  },  
+  "taxes": {  
+    "taxes_total_incidents_displayed": null,  
+    "ibpt_approx": {  
+      "federal": null,  
+      "state": null,  
+      "source_code": null  
+    }  
+  },  
+  "items": [  
+    {  
+      "line_number": null,  
+      "description_raw": null,  
+      "product_code_raw": null,  
+      "quantity": null,  
+      "unit": null,  
+      "unit_price": null,  
+      "total_price": null,  
+      "tags": ["unknown"],  
+      "confidence": {  
+        "description": 1.0,  
+        "quantity": 1.0,  
+        "prices": 1.0  
+      }  
+    }  
+  ],  
+  "retrieval": {  
+    "fingerprints": {  
+      "merchant_cnpj_digits": null,  
+      "issue_date": null,  
+      "total_brl": null  
+    }  
+  }  
+}
+
+
+Now process this URL: {{URL}}</value>
+  </data>
+</root>

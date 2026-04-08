@@ -4,6 +4,7 @@ using OpenAI.Chat;
 using Purchases.Application.Contracts;
 using Purchases.Application.Models;
 using Purchases.Application.Models.Settings;
+using Purchases.Application.Properties;
 using System.ClientModel;
 using System.Text;
 using System.Text.Json;
@@ -63,7 +64,7 @@ namespace Purchases.Application.Services
             // Return the full HTML string
             var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            var systemPrompt = File.ReadAllText("Prompts/ExtractReceiptBasedOnHtmlContent.txt");
+            var systemPrompt = Resources.ExtractReceiptBasedOnUrlInfo;
 
             var userMessage = $"""  
                         HTML: {htmlContent}  
