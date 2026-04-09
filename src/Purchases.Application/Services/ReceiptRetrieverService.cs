@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
-using OpenAI;
-using OpenAI.Chat;
 using Purchases.Application.Properties;
 using Purchases.Domain.Contracts;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.Settings;
-using System.ClientModel;
 using System.Text;
 using System.Text.Json;
 using Telegram.Bot.Types;
@@ -15,6 +12,7 @@ namespace Purchases.Application.Services
     public class ReceiptRetrieverService : IReceiptRetrieverService
     {
         private readonly IPurchaseService _purchaseService;
+        private readonly ILlmProcessor _llmProcessor;
         private readonly IMessageNotifier _messageNotifier;
         private readonly IRemoteFileManager _remoteFileManager;
         private readonly IHttpClientFactory _httpClientFactory;
@@ -22,12 +20,14 @@ namespace Purchases.Application.Services
 
         public ReceiptRetrieverService(
             IPurchaseService purchaseService,
+            ILlmProcessor llmProcessor,
             IMessageNotifier messageNotifier,
             IRemoteFileManager remoteFileManager,
             IHttpClientFactory httpClientFactory,
             IOptions<OpenAiSettings> openAiOptions)
         {
             _purchaseService = purchaseService;
+            _llmProcessor = llmProcessor;
             _messageNotifier = messageNotifier;
             _remoteFileManager = remoteFileManager;
             _httpClientFactory = httpClientFactory;
@@ -57,7 +57,7 @@ namespace Purchases.Application.Services
                         URL: {url}  
                         """;
 
-            var llmResponse = await SendInfoToLlmAsync(systemPrompt, userMessage);
+            var llmResponse = await _llmProcessor.Analyze(systemPrompt, userMessage);
 
             if (_openAiSettings.TestMode)
             {
@@ -79,7 +79,7 @@ namespace Purchases.Application.Services
 
             // Sending info to LLM - QR Code reader
             var qrCodeReaderPromt = Resources.ExtractQrCodeBasedOnImage;
-            var qrDecodingOutput = await SendInfoToLlmAsync(qrCodeReaderPromt, imageBinary);
+            var qrDecodingOutput = await _llmProcessor.Analyze(qrCodeReaderPromt, imageBinary);
 
             await _messageNotifier.SendMessage(
                 chatMessageId,
@@ -93,7 +93,7 @@ namespace Purchases.Application.Services
             var imageBinary = await GetImageBinaryData(fileId, cancellationToken);
 
             var promptMessage = Resources.ExtractReceiptBasedOnImage;
-            var modelAnalysisOutput = await SendInfoToLlmAsync(promptMessage, imageBinary);
+            var modelAnalysisOutput = await _llmProcessor.Analyze(promptMessage, imageBinary);
 
             if (_openAiSettings.TestMode)
             {
@@ -113,73 +113,6 @@ namespace Purchases.Application.Services
             await SavePurchaseAsync(obtainedReceiptData!, chatMessageId);
         }
         #endregion Receipt Handling
-
-        #region LLM Processing
-
-        private async Task<string> SendInfoToLlmAsync(
-            string promptMessage,
-            BinaryData imageBinary)
-        {
-            var aiChatMessage = new UserChatMessage(
-                ChatMessageContentPart.CreateTextPart(promptMessage),
-                ChatMessageContentPart.CreateImagePart(imageBinary, "image/jpeg")
-            );
-
-            var client = GetChatClient();
-
-            var completion = await client.CompleteChatAsync(
-                [aiChatMessage]
-            );
-
-            var modelAnalysisOutput = completion.Value.Content[0].Text;
-
-            return modelAnalysisOutput;
-        }
-
-        private async Task<string> SendInfoToLlmAsync(
-            string systemPrompt,
-            string userMessage)
-        {
-            var chatMessages = new List<ChatMessage>()
-            {
-                new SystemChatMessage(systemPrompt),
-                new UserChatMessage(userMessage)
-            };
-
-            var client = GetChatClient();
-
-            var response = await client.CompleteChatAsync(
-                chatMessages,
-                new ChatCompletionOptions()
-                {
-                    Temperature = 0
-                }
-            );
-
-            var modelAnalysisOutput = response.Value.Content[0].Text;
-
-            return modelAnalysisOutput;
-        }
-
-        private ChatClient GetChatClient()
-        {
-            var apiKey = _openAiSettings.ApiKey;
-            var model = _openAiSettings.Model;
-            var endpoint = new Uri(_openAiSettings.Endpoint!);
-
-            var credential = new ApiKeyCredential(apiKey!);
-
-            var clientOptions = new OpenAIClientOptions
-            {
-                Endpoint = endpoint
-            };
-
-            var openAIClient = new OpenAIClient(credential, clientOptions);
-            var client = openAIClient.GetChatClient(model);
-
-            return client;
-        }
-        #endregion LLM Processing
 
         private async Task<BinaryData> GetImageBinaryData(string fileId, CancellationToken cancellationToken)
         {

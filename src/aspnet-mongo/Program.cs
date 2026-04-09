@@ -41,6 +41,7 @@ namespace aspnet_mongo
             builder.Services.AddScoped<IReceiptRetrieverService, ReceiptRetrieverService>();
             builder.Services.AddScoped<IMessageNotifier, TelegramMessageNotifier>();
             builder.Services.AddScoped<IRemoteFileManager, TelegramRemoteFileManager>();
+            builder.Services.AddScoped<ILlmProcessor, LlmProcessor>();
 
             // DI for Repos
             builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();

@@ -31,7 +31,7 @@ namespace Purchases.Application.Services
         {
             var vendor = await _vendorRepository.GetByNameAsync(name, cancellationToken);
 
-            return new GetVendorDto { Id = vendor.Id, Name = vendor.Name, LogoUrl = vendor.LogoUrl };
+            return new GetVendorDto { Id = vendor?.Id, Name = vendor?.Name, LogoUrl = vendor?.LogoUrl };
         }
 
         public async Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken)
