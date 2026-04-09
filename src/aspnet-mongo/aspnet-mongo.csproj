@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Purchases.Application\Purchases.Application.csproj" />
+    <ProjectReference Include="..\Purchases.Domain\Purchases.Domain.csproj" />
+    <ProjectReference Include="..\Purchases.Infrastructure\Purchases.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
