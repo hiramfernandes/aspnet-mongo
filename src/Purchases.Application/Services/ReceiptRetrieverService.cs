@@ -2,6 +2,7 @@
 using Purchases.Application.Properties;
 using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
+using Purchases.Domain.Models.DTO.Purchase;
 using Purchases.Domain.Models.Settings;
 using System.Text;
 using System.Text.Json;
@@ -136,22 +137,21 @@ namespace Purchases.Application.Services
                 return;
             }
 
-            var purchase = new Purchase()
+            var purchase = new PurchaseDto()
             {
                 PurchaseDate = purchaseDate.Date,
-                PurchaseUrl = url ?? obtainedReceiptData?.QR?.Url,
+                Url = url ?? obtainedReceiptData?.QR?.Url,
                 VendorName = vendorName,
                 VendorId = null,
                 TotalAmount = obtainedReceiptData!.Totals?.Total,
                 Items = obtainedReceiptData!.Items?.Select(item =>
-                    new PurchaseItem()
+                    new PurchaseItemDto()
                     {
                         Description = item.DescriptionRaw,
                         Tags = item.Tags?.ToArray(),
                         UnitPrice = (float?)item.UnitPrice
                     }
                 ).ToArray(),
-                UpdatedAtUtc = DateTime.UtcNow,
             };
 
             await _purchaseService.CreateAsync(purchase);
