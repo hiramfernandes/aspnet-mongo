@@ -1,20 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.Settings;
 
 namespace Purchases.Application.Repository;
-
-public interface IVendorRepository
-{
-    Task CreateAsync(Vendor vendor, CancellationToken cancellationToken);
-    Task CreateVendor(Vendor vendor, CancellationToken cancellationToken);
-    Task<IEnumerable<Vendor>> GetAllAsync();
-    Task<Vendor> GetAsync(string id);
-    Task<Vendor?> GetByNameAsync(string name, CancellationToken cancellationToken);
-    Task RemoveAsync(string id, CancellationToken cancellationToken);
-    Task UpdateVendor(string id, Vendor vendor, CancellationToken cancellationToken);
-}
 
 public class VendorRepository : IVendorRepository
 {
@@ -62,17 +52,6 @@ public class VendorRepository : IVendorRepository
         return await _vendorsCollection
             .Find(x => x.Name == name)
             .FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public async Task CreateVendor(Vendor vendor, CancellationToken cancellationToken)
-    {
-        InsertOneOptions options = new InsertOneOptions
-        {
-            BypassDocumentValidation = false,
-            Comment = "Added using asp.net backend"
-        };
-
-        await _vendorsCollection.InsertOneAsync(vendor, options, cancellationToken);
     }
 
     public async Task UpdateVendor(string id, Vendor vendor, CancellationToken cancellationToken)

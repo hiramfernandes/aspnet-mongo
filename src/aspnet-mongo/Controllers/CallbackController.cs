@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Purchases.Domain.Contracts;
+using Purchases.Domain.Contracts.Services;
 using Telegram.Bot.Types;
 
 namespace aspnet_mongo.Controllers

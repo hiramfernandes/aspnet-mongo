@@ -1,7 +1,7 @@
 ﻿using Purchases.Domain.Models;
 using Purchases.Domain.Models.DTO.Purchase;
 
-namespace Purchases.Domain.Contracts;
+namespace Purchases.Domain.Contracts.Services;
 
 public interface IPurchaseService
 {

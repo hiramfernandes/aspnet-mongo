@@ -1,7 +1,7 @@
-using Purchases.Application.Contracts;
 using Purchases.Application.Repository;
 using Purchases.Application.Services;
-using Purchases.Domain.Contracts;
+using Purchases.Domain.Contracts.Repos;
+using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models.Settings;
 using Purchases.Infrastructure.Repository;
 
@@ -12,6 +12,7 @@ namespace aspnet_mongo
         public static void Main(string[] args)
         {
             var allowedOriginsPolicyName = "_allowedOrigins";
+            var allowReactAppCorsName = "AllowReactApp";
 
             var builder = WebApplication.CreateBuilder(args);
 

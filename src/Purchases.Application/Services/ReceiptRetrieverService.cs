@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Purchases.Application.Properties;
-using Purchases.Domain.Contracts;
+using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.Settings;
 using System.Text;

@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 
-namespace Purchases.Domain.Contracts;
+namespace Purchases.Domain.Contracts.Services;
 
 public interface IRemoteFileManager
 {

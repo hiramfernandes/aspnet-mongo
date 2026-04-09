@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Purchases.Application.Contracts;
+using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.DTO.Vendor;
 

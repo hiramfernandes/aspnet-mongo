@@ -1,0 +1,13 @@
+﻿using Purchases.Domain.Models.DTO.Vendor;
+
+namespace Purchases.Domain.Contracts.Services;
+
+public interface IVendorService
+{
+    Task<IEnumerable<GetVendorDto>> GetAllAsync();
+    Task<GetVendorDto> GetById(string id);
+    Task<GetVendorDto?> GetByName(string name, CancellationToken cancellationToken);
+    Task CreateVendor(CreateVendorDto vendorDto, CancellationToken cancellationToken);
+    Task UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken);
+    Task RemoveAsync(string id, CancellationToken cancellationToken);
+}

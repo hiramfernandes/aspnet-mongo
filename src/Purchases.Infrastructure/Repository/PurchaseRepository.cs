@@ -1,19 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.Settings;
 
 namespace Purchases.Infrastructure.Repository;
-
-public interface IPurchaseRepository
-{
-    Task<IEnumerable<Purchase>> GetAllAsync(int pageSize, CancellationToken cancellationToken);
-    Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken);
-    Task CreateAsync(Purchase newPurchase);
-    Task RemoveAsync(string id);
-    Task UpdateAsync(string id, Purchase updatedPurchase);
-}
 
 public class PurchaseRepository : IPurchaseRepository
 {

@@ -1,5 +1,6 @@
-﻿using Purchases.Application.Contracts;
-using Purchases.Application.Repository;
+﻿using Purchases.Application.Repository;
+using Purchases.Domain.Contracts.Repos;
+using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.DTO.Vendor;
 

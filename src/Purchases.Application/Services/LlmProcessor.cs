@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
-using Purchases.Domain.Contracts;
+using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models.Settings;
 using System.ClientModel;
 
