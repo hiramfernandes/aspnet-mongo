@@ -1,7 +1,8 @@
 using Purchases.Application.Contracts;
-using Purchases.Application.Models.Settings;
 using Purchases.Application.Repository;
 using Purchases.Application.Services;
+using Purchases.Domain.Contracts;
+using Purchases.Domain.Models.Settings;
 
 namespace aspnet_mongo
 {

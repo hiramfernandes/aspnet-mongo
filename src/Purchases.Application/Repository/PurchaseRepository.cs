@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Purchases.Application.Models;
-using Purchases.Application.Models.Settings;
+using Purchases.Domain.Models;
+using Purchases.Domain.Models.Settings;
 
 namespace Purchases.Application.Repository
 {

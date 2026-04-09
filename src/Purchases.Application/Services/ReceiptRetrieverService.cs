@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using OpenAI;
 using OpenAI.Chat;
-using Purchases.Application.Contracts;
-using Purchases.Application.Models;
-using Purchases.Application.Models.Settings;
 using Purchases.Application.Properties;
+using Purchases.Domain.Contracts;
+using Purchases.Domain.Models;
+using Purchases.Domain.Models.Settings;
 using System.ClientModel;
 using System.Text;
 using System.Text.Json;

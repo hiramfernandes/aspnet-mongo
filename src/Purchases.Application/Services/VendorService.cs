@@ -1,8 +1,7 @@
-﻿using aspnet_mongo.Models;
-using MongoDB.Driver;
-using Purchases.Application.Contracts;
-using Purchases.Application.Models.DTO.Vendor;
+﻿using Purchases.Application.Contracts;
 using Purchases.Application.Repository;
+using Purchases.Domain.Models;
+using Purchases.Domain.Models.DTO.Vendor;
 
 namespace Purchases.Application.Services
 {

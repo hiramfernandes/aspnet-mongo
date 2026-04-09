@@ -1,4 +1,4 @@
-﻿using Purchases.Application.Models.DTO.Vendor;
+﻿using Purchases.Domain.Models.DTO.Vendor;
 
 namespace Purchases.Application.Contracts
 {

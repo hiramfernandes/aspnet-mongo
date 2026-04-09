@@ -1,9 +1,10 @@
 ﻿using MongoDB.Driver;
 using Purchases.Application.Contracts;
-using Purchases.Application.Models;
-using Purchases.Application.Models.DTO.Purchase;
-using Purchases.Application.Models.DTO.Vendor;
 using Purchases.Application.Repository;
+using Purchases.Domain.Contracts;
+using Purchases.Domain.Models;
+using Purchases.Domain.Models.DTO.Purchase;
+using Purchases.Domain.Models.DTO.Vendor;
 
 namespace Purchases.Application.Services
 {
