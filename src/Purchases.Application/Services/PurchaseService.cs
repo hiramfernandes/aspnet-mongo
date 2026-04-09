@@ -32,11 +32,58 @@ namespace Purchases.Application.Services
         public async Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken) =>
             await _purchaseRepository.GetAsync(id, cancellationToken);
 
-        public async Task CreateAsync(Purchase newPurchase) =>
-            await _purchaseRepository.CreateAsync(newPurchase);
+        public async Task CreateAsync(PurchaseDto newPurchaseDto)
+        {
+            var newPurchase = new Purchase()
+            {
+                PurchaseDate = newPurchaseDto.PurchaseDate,
+                PurchaseUrl = newPurchaseDto.Url,
+                VendorName = newPurchaseDto.VendorName,
+                VendorId = newPurchaseDto.VendorId,
+                TotalAmount = newPurchaseDto.TotalAmount,
+                Items = newPurchaseDto.Items?
+                .Select(item =>
+                    new PurchaseItem()
+                    {
+                        Description = item.Description,
+                        UnitPrice = item.UnitPrice,
+                        Tags = item.Tags
+                    })
+                .ToArray(),
+                UpdatedAtUtc = DateTime.UtcNow,
+            };
 
-        public async Task UpdateAsync(string id, Purchase updatedPurchase) =>
-            await _purchaseRepository.UpdateAsync(id, updatedPurchase);
+            await _purchaseRepository.CreateAsync(newPurchase);
+        }
+
+        public async Task UpdateAsync(
+            string id, 
+            PurchaseDto purchaseDto, 
+            CancellationToken cancellationToken)
+        {
+            var purchaseFromDb = await _purchaseRepository.GetAsync(id, cancellationToken);
+            if (purchaseFromDb == null)
+                throw new InvalidOperationException("Unable to find purchase");
+
+            purchaseFromDb.PurchaseDate = purchaseDto.PurchaseDate;
+            purchaseFromDb.VendorName = purchaseDto.VendorName;
+            purchaseFromDb.VendorId = purchaseDto.VendorId;
+            purchaseFromDb.PurchaseUrl = purchaseDto.Url;
+            purchaseFromDb.Items = purchaseDto.Items?
+                .Select(item =>
+                    new PurchaseItem()
+                    {
+                        Description = item.Description,
+                        UnitPrice = item.UnitPrice,
+                        Tags = item.Tags
+                    })
+                .ToArray();
+            purchaseFromDb.TotalAmount = purchaseDto.TotalAmount;
+            purchaseFromDb.UpdatedAtUtc = DateTime.UtcNow;
+
+            await _purchaseRepository.UpdateAsync(id, purchaseFromDb);
+        }
+            
 
         public async Task RemoveAsync(string id) =>
             await _purchaseRepository.RemoveAsync(id);

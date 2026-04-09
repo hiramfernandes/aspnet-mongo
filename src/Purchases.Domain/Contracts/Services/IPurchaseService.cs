@@ -5,9 +5,9 @@ namespace Purchases.Domain.Contracts.Services;
 
 public interface IPurchaseService
 {
-    Task CreateAsync(Purchase newPurchase);
+    Task CreateAsync(PurchaseDto newPurchase);
     Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize, CancellationToken cancellationToken);
     Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken);
     Task RemoveAsync(string id);
-    Task UpdateAsync(string id, Purchase updatedPurchase);
+    Task UpdateAsync(string id, PurchaseDto purchaseDto, CancellationToken cancellationToken);
 }
