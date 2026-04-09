@@ -61,6 +61,77 @@ namespace Purchases.Application.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Act as a high-precision optical scanner. Analyze the QR code in this image. Your task is to decode the embedded URL exactly as it is encoded, character by character.
+        ///
+        ///    First, identify the type of data (e.g., a URL).
+        ///    Carefully decode the string.
+        ///    Double-check for common URL structures (https, subdomains, parameters).
+        ///    Output ONLY the final decoded URL string without any conversational filler..
+        /// </summary>
+        internal static string ExtractQrCodeBasedOnImage {
+            get {
+                return ResourceManager.GetString("ExtractQrCodeBasedOnImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role: You are a specialized NFC-e HTML parser. You output only raw valid JSON. No markdown, no backticks, no preamble.
+        ///
+        ///Input:
+        ///
+        ///    html_content: The raw HTML of a Brazilian NFC-e receipt.
+        ///    source_url: The URL this HTML was saved from.
+        ///
+        ///Instructions:
+        ///
+        ///    Extract &amp; Map: Parse the html_content into the schema below. Use null for missing fields.
+        ///    Normalization:
+        ///        Convert Brazilian numbers (1.234,56) to standard decimals (1234.56).
+        ///        Convert dates (03/03/2026 19:00:50) to ISO-8601 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExtractReceiptBasedOnHtmlContent {
+            get {
+                return ResourceManager.GetString("ExtractReceiptBasedOnHtmlContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Brazilian NFC-e Extraction Prompt (Decimal Version)
+        ///
+        ///You are a specialized Brazilian NFC-e (Nota Fiscal de Consumidor Eletrônica) data extraction engine. Your goal is to convert a receipt image into a high-precision JSON object.
+        ///1. Image &amp; OCR Pre-processing
+        ///
+        ///    The receipt may be rotated or at an angle; mentally deskew before reading.
+        ///    Brazilian receipts use a COMMA (,) as a decimal separator. You must convert this to a DOT (.) for the JSON output.
+        ///
+        ///2. Date &amp; Time Formatting (STRICT - Local Time)
+        ///
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExtractReceiptBasedOnImage {
+            get {
+                return ResourceManager.GetString("ExtractReceiptBasedOnImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are a JSON-only data extraction engine. You never explain, never add markdown, and never add commentary. You only output raw valid JSON.
+        ///
+        ///Input: A single URL to an NFC-e QR/consultation page: {{URL}}
+        ///
+        ///Execution Steps:
+        ///
+        ///    MANDATORY: Use the URL Viewer tool to fetch the content of {{URL}}.
+        ///    Once the content is retrieved, extract all available receipt data: merchant, address, NFC-e details, access key, items, totals, payments, and taxes.
+        ///    Normalize and output ONLY a single JSON object match [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ExtractReceiptBasedOnUrlAndNavigate {
+            get {
+                return ResourceManager.GetString("ExtractReceiptBasedOnUrlAndNavigate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are an information extraction and classification engine for Brazilian NFC-e (&quot;Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica&quot;) consultation pages.
         ///
         ///Input: a single URL to an NFC-e QR/consultation page, like: {{URL}}
@@ -72,6 +143,15 @@ namespace Purchases.Application.Properties {
         internal static string ExtractReceiptBasedOnUrlInfo {
             get {
                 return ResourceManager.GetString("ExtractReceiptBasedOnUrlInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What do you see in this image?.
+        /// </summary>
+        internal static string WhatDoYouSee {
+            get {
+                return ResourceManager.GetString("WhatDoYouSee", resourceCulture);
             }
         }
     }

@@ -1,6 +1,0 @@
-Act as a high-precision optical scanner. Analyze the QR code in this image. Your task is to decode the embedded URL exactly as it is encoded, character by character.
-
-    First, identify the type of data (e.g., a URL).
-    Carefully decode the string.
-    Double-check for common URL structures (https, subdomains, parameters).
-    Output ONLY the final decoded URL string without any conversational filler.
