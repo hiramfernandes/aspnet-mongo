@@ -1,32 +1,30 @@
-﻿using MongoDB.Driver;
-using Purchases.Domain.Contracts.Repos;
+﻿using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.DTO.Purchase;
-using Purchases.Domain.Models.DTO.Vendor;
 
 namespace Purchases.Application.Services
 {
     public class PurchaseService : IPurchaseService
     {
         private readonly IPurchaseRepository _purchaseRepository;
-        private readonly IVendorService _vendorService;
+        //private readonly IVendorService _vendorService;
 
         public PurchaseService(
             IPurchaseRepository purchaseRepository,
             IVendorService vendorService)
         {
             _purchaseRepository = purchaseRepository;
-            _vendorService = vendorService;
+            //_vendorService = vendorService;
         }
 
         public async Task<IEnumerable<GetPurchaseDto>> GetAllAsync(int pageSize, CancellationToken cancellationToken)
         {
             var purchases = await _purchaseRepository.GetAllAsync(pageSize, cancellationToken);
 
-            // TODO: Optimize vendors retrieval
-            var vendors = await _vendorService.GetAllAsync();
-            var purchaseDtos = purchases.Select(purchase => MapFrom(purchase, vendors));
+            //// TODO: Optimize vendors retrieval
+            //var vendors = await _vendorService.GetAllAsync();
+            var purchaseDtos = purchases.Select(purchase => MapFrom(purchase));
 
             return purchaseDtos;
         }
@@ -43,19 +41,18 @@ namespace Purchases.Application.Services
         public async Task RemoveAsync(string id) =>
             await _purchaseRepository.RemoveAsync(id);
 
-        private GetPurchaseDto MapFrom(Purchase purchase, IEnumerable<GetVendorDto> vendors)
+        private GetPurchaseDto MapFrom(Purchase purchase)
         {
-            var vendor = vendors.FirstOrDefault(x => x.Id == purchase.VendorId);
             return new GetPurchaseDto()
             {
                 Id = purchase.Id,
                 PurchaseDate = purchase.PurchaseDate,
                 PurchaseUrl = purchase.PurchaseUrl,
                 TotalAmount = purchase.TotalAmount,
-                VendorId = vendor?.Id,
-                VendorName = vendor?.Name,
-                VendorLogoUrl = vendor?.LogoUrl,
-                Items = purchase.Items?.Select(item =>
+                VendorId = purchase?.VendorId,
+                VendorName = purchase?.VendorName,
+                //VendorLogoUrl = vendor?.LogoUrl,
+                Items = purchase?.Items?.Select(item =>
                     new PurchaseItemDto()
                     {
                         Description = item.Description,

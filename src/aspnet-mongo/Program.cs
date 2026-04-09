@@ -11,7 +11,6 @@ namespace aspnet_mongo
     {
         public static void Main(string[] args)
         {
-            var allowedOriginsPolicyName = "_allowedOrigins";
             var allowReactAppCorsName = "AllowReactApp";
 
             var builder = WebApplication.CreateBuilder(args);
@@ -19,14 +18,18 @@ namespace aspnet_mongo
             // Add CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: allowedOriginsPolicyName,
+                options.AddPolicy(name: allowReactAppCorsName,
                 policy =>
                 {
-                    // TODO: Re-enable specific origins once able to fix this
-                    // policy.WithOrigins(@"https://aspnet-mongo.azurewebsites.net");
+                    policy
+                        .WithOrigins(
+                            "https://react-purchases.vercel.app"
+                            //"http://localhost:5173" // In case testing FE locally
+                            )
+                        .AllowCredentials();
+
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
-                    policy.AllowAnyOrigin();
                 });
             });
 
@@ -68,7 +71,7 @@ namespace aspnet_mongo
             app.UseHttpsRedirection();
             app.MapControllers();
             app.UseRouting();
-            app.UseCors(allowedOriginsPolicyName);
+            app.UseCors(allowReactAppCorsName);
             app.UseAuthorization();
 
             app.Run();
