@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Purchases.Application.Repository;
 using Purchases.Application.Services;
@@ -5,6 +7,7 @@ using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models.Settings;
 using Purchases.Infrastructure.Repository;
+using System.Text;
 
 namespace aspnet_mongo;
 
@@ -55,6 +58,7 @@ public class Program
         builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
         builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));
         builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAiIntegration"));
+        builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 
         builder.Services.AddSingleton<IMongoClient>(sp =>
         {
@@ -63,6 +67,32 @@ public class Program
 
             return new MongoClient(connString);
         });
+
+        // Add JWT Authentication
+        var jwtSettings = builder.Configuration.GetSection("JWT").Get<JwtSettings>();
+
+        builder.Services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var jwtIssuer = jwtSettings?.Issuer;
+                var jwtAudience = jwtSettings?.Audience;
+                var jwtKey = jwtSettings?.Key ?? throw new InvalidOperationException("Invalid Key");
+
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = jwtIssuer,
+                    ValidAudience = jwtAudience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                    ClockSkew = TimeSpan.FromDays(1)
+                };
+            });
+
+        builder.Services.AddAuthorization();
 
         // Generic Scraper Client Setup
         builder.Services.AddHttpClient("Scraper", client =>
@@ -84,6 +114,7 @@ public class Program
         app.MapControllers();
         app.UseRouting();
         app.UseCors(allowReactAppCorsName);
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.Run();
