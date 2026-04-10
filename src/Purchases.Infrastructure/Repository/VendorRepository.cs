@@ -13,12 +13,12 @@ public class VendorRepository : IVendorRepository
     private readonly IMongoCollection<Vendor> _vendorsCollection;
 
     public VendorRepository(
-        IOptions<MongoDbSettings> databaseSettings)
+        IOptions<MongoDbSettings> databaseSettings,
+        IMongoClient mongoClient)
     {
         var connectionString = databaseSettings.Value.ConnectionString;
         var dbName = databaseSettings.Value.DatabaseName;
 
-        var mongoClient = new MongoClient(connectionString);
         var mongoDatabase = mongoClient.GetDatabase(dbName);
 
         _vendorsCollection = mongoDatabase.GetCollection<Vendor>(_collectionName);

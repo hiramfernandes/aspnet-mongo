@@ -1,3 +1,4 @@
+using MongoDB.Driver;
 using Purchases.Application.Repository;
 using Purchases.Application.Services;
 using Purchases.Domain.Contracts.Repos;
@@ -54,6 +55,14 @@ namespace aspnet_mongo
             builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
             builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));
             builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAiIntegration"));
+
+            builder.Services.AddSingleton<IMongoClient>(sp =>
+            {
+                var mongoDbSection = builder.Configuration.GetSection("PurchasesDatabase");
+                var connString = mongoDbSection.GetValue<string>("ConnectionString") ?? throw new InvalidOperationException("Unable to retrieve Mongo db settings");
+
+                return new MongoClient(connString);
+            });
 
             // Generic Scraper Client Setup
             builder.Services.AddHttpClient("Scraper", client =>

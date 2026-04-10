@@ -41,8 +41,8 @@ namespace Purchases.Application.Services
                 Name = vendorDto.Name,
                 Location = vendorDto.Location,
                 LogoUrl = vendorDto.LogoUrl,
-                AddedOn = DateTime.Now,
-                UpdatedOn = DateTime.Now
+                AddedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow
             };
 
             await _vendorRepository.CreateAsync(vendor, cancellationToken);
@@ -56,7 +56,7 @@ namespace Purchases.Application.Services
 
             vendor.LogoUrl = updateVendorDto.Url;
             vendor.Name = updateVendorDto.Name;
-            vendor.UpdatedOn = DateTime.Now;
+            vendor.UpdatedOn = DateTime.UtcNow;
 
             await _vendorRepository.UpdateVendor(id, vendor, cancellationToken);
         }

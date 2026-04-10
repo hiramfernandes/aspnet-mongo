@@ -41,8 +41,8 @@ namespace aspnet_mongo.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateVendor(string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateVendor([FromRoute] string id, UpdateVendorDto updateVendorDto, CancellationToken cancellationToken)
         {
             try
             {
@@ -60,8 +60,8 @@ namespace aspnet_mongo.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteVendor(string id, CancellationToken cancellationToken)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteVendor([FromRoute] string id, CancellationToken cancellationToken)
         {
             await _vendorService.RemoveAsync(id, cancellationToken);
 

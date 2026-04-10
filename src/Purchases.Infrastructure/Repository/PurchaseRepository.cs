@@ -13,12 +13,13 @@ public class PurchaseRepository : IPurchaseRepository
 
     private readonly string _collectionName = "purchases";
 
-    public PurchaseRepository(IOptions<MongoDbSettings> databaseSettings)
+    public PurchaseRepository(
+        IOptions<MongoDbSettings> databaseSettings,
+        IMongoClient mongoClient)
     {
         var connectionString = databaseSettings.Value.ConnectionString;
         var dbName = databaseSettings.Value.DatabaseName;
 
-        var mongoClient = new MongoClient(connectionString);
         var mongoDatabase = mongoClient.GetDatabase(dbName);
 
         _purchasesCollection = mongoDatabase.GetCollection<Purchase>(_collectionName);
