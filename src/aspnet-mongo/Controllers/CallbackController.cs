@@ -37,6 +37,9 @@ namespace aspnet_mongo.Controllers
             [FromBody] string url,
             CancellationToken cancellationToken)
         {
+            if (!ValidUrl(url))
+                return BadRequest("Invalid URL");
+
             await _receiptRetrieverService.HandleReceiptUrl(url, default, cancellationToken);
 
             return Ok();
@@ -50,13 +53,32 @@ namespace aspnet_mongo.Controllers
             if (message?.Text != null)
             {
                 var url = message.Text;
+                if (!ValidUrl(url))
+                    throw new InvalidOperationException("Invalid URL");
+
                 await _receiptRetrieverService.HandleReceiptUrl(url, message?.Chat.Id ?? default, cancellationToken);
             }
             else if (message?.Photo != null)
             {
-                var fileId = message.Photo?.Last().FileId ?? message.Document?.FileId ?? throw new Exception("File not found");
+                var fileId = message.Photo?.LastOrDefault()?.FileId ?? message.Document?.FileId ?? throw new Exception("File not found");
                 await _receiptRetrieverService.HandleImage(fileId, message?.Chat.Id ?? default, cancellationToken);
             }
+        }
+
+        private bool ValidUrl(string url)
+        {
+            // Validate URL
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                return false;
+
+            if ((uri.Scheme != "http" && uri.Scheme != "https") ||
+                 uri.Host.Contains("localhost") ||
+                 uri.Host.StartsWith("192.168.") ||
+                 uri.Host.StartsWith("10.") ||
+                 uri.Host == "127.0.0.1")
+                return false;
+
+            return true;
         }
     }
 }

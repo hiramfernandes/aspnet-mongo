@@ -62,7 +62,7 @@ namespace Purchases.Application.Services
 
             if (_openAiSettings.TestMode)
             {
-                using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(llmResponse));
+                var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(llmResponse));
                 await _messageNotifier.SendDocument(
                     messageId,
                     InputFile.FromStream(jsonStream, "receipt_parsed.json"));
