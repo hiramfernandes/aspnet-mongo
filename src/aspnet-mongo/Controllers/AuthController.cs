@@ -11,7 +11,7 @@ using System.Text;
 
 namespace aspnet_mongo.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -60,12 +60,12 @@ namespace aspnet_mongo.Controllers
             return Ok(new { accessToken = jwt });
         }
 
-        [HttpGet]
+        [HttpGet("user-info")]
         public async Task<IActionResult> GetUserInfoAsync()
         {
             await Task.Delay(500);
 
-            return Ok();
+            return Ok("No info (yet)");
         }
     }
 }
