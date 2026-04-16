@@ -4,7 +4,7 @@ using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Models;
 using Purchases.Domain.Models.Settings;
 
-namespace Purchases.Application.Repository;
+namespace Purchases.Infrastructure.Repository;
 
 public class VendorRepository : IVendorRepository
 {

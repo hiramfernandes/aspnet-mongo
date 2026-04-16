@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using Purchases.Application.Repository;
 using Purchases.Application.Services;
 using Purchases.Domain.Contracts.Repos;
 using Purchases.Domain.Contracts.Services;

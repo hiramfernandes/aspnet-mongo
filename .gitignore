@@ -15,7 +15,8 @@ x64/
 
 /.vs/aspnet-mongo/v17/.futdcache.v2
 /.vs/ProjectEvaluation/aspnet-mongo.metadata.v7.bin
-/aspnet-mongo/appsettings.Development.json
 *.user
 *.bin
 /src/aspnet-mongo/appsettings.Development.json
+src/Purchases.Worker/appsettings.Development.json
+appsettings.Development.json

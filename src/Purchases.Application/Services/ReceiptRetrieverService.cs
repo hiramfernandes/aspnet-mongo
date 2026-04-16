@@ -34,9 +34,9 @@ namespace Purchases.Application.Services
             _httpClientFactory = httpClientFactory;
             _openAiSettings = openAiOptions.Value;
         }
-        
+
         #region Receipt Handling
-        public async Task HandleReceiptUrl(string url, long messageId, CancellationToken cancellationToken)
+        public async Task<NfcReceipt> HandleReceiptUrl(string url, long messageId, CancellationToken cancellationToken)
         {
             var httpClient = _httpClientFactory.CreateClient("Scraper");
             using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseContentRead, cancellationToken);
@@ -68,9 +68,18 @@ namespace Purchases.Application.Services
                     InputFile.FromStream(jsonStream, "receipt_parsed.json"));
             }
 
-            var nfcReceipt = JsonSerializer.Deserialize<NfcReceipt>(llmResponse);
-
+            NfcReceipt nfcReceipt = new();
+            try
+            {
+                nfcReceipt = JsonSerializer.Deserialize<NfcReceipt>(llmResponse);
+            }
+            catch (Exception exc)
+            {
+                await _messageNotifier.SendMessage(messageId, $"Error when deserializing Receipt message: {exc.Message}");
+            }
             await SavePurchaseAsync(nfcReceipt!, messageId, url);
+
+            return nfcReceipt;
         }
 
         public async Task HandleQrCode(string fileId, long chatMessageId, CancellationToken cancellationToken)
