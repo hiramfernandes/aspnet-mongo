@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +12,7 @@ using System.Text;
 
 namespace aspnet_mongo.Controllers
 {
-    [Route("[controller]")]
+    [Route("auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -23,6 +24,7 @@ namespace aspnet_mongo.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginRequest request)
         {
             var userIsValid = 
@@ -61,11 +63,16 @@ namespace aspnet_mongo.Controllers
         }
 
         [HttpGet("user-info")]
+        [Authorize]
         public async Task<IActionResult> GetUserInfoAsync()
         {
             await Task.Delay(500);
 
-            return Ok("No info (yet)");
+            return Ok(new
+            {
+                UserId = User.FindFirst("sub")?.Value,
+                Email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value,
+            });
         }
     }
 }
