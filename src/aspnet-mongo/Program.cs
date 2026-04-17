@@ -15,7 +15,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var allowReactAppCorsName = "AllowReactApp";
+        const string schemeId = "bearer";
+        const string allowReactAppCorsName = "AllowReactApp";
 
         var builder = WebApplication.CreateBuilder(args);
 
@@ -41,19 +42,6 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-            {
-                Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
-                      Enter 'Bearer' [space] and then your token in the text input below.
-                      \r\n\r\nExample: 'Bearer 12345abcdef'",
-                Name = "Authorization",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey,
-                Scheme = "Bearer"
-            });
-        });
 
         // Dependency Injection Setup for Services
         builder.Services.AddScoped<IPurchaseService, PurchaseService>();
@@ -105,6 +93,39 @@ public class Program
             });
 
         builder.Services.AddAuthorization();
+
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "Purchases API", Version = "v1" });
+            options.AddSecurityDefinition(schemeId, new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                //In = ParameterLocation.Header,
+                //Name = "Authorization",
+                Description = "JWT Authorization Token",
+            });
+
+            options.AddSecurityRequirement(document =>
+            {
+                return new()
+                {
+                    [
+                        new OpenApiSecuritySchemeReference(schemeId)
+                        {
+                            Reference = new OpenApiReferenceWithDescription
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = schemeId
+                            }
+                        }
+                    ] = []
+                };
+            });
+        });
+
+
 
         // Generic Scraper Client Setup
         builder.Services.AddHttpClient("Scraper", client =>
