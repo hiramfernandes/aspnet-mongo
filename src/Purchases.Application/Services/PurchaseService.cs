@@ -32,8 +32,15 @@ namespace Purchases.Application.Services
         public async Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken) =>
             await _purchaseRepository.GetAsync(id, cancellationToken);
 
-        public async Task CreateAsync(PurchaseDto newPurchaseDto)
+        public async Task CreateAsync(PurchaseDto newPurchaseDto, CancellationToken cancellationToken)
         {
+            // Ensure the record does not exist in the repository
+            var purchaseUrl = newPurchaseDto.Url;
+            var existingPurchase = await _purchaseRepository.GetByUrlAsync(purchaseUrl!, cancellationToken);
+
+            if (existingPurchase != null)
+                throw new InvalidOperationException("Purchase already exists in the database");
+
             var newPurchase = new Purchase()
             {
                 PurchaseDate = newPurchaseDto.PurchaseDate,

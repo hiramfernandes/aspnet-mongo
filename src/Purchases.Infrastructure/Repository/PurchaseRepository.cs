@@ -37,6 +37,9 @@ public class PurchaseRepository : IPurchaseRepository
     public async Task<Purchase?> GetAsync(string id, CancellationToken cancellationToken) =>
         await _purchasesCollection.Find(x => x.Id == id).FirstOrDefaultAsync(cancellationToken);
 
+    public async Task<Purchase> GetByUrlAsync(string url, CancellationToken cancellationToken) =>
+        await _purchasesCollection.Find(x => x.PurchaseUrl == url).FirstOrDefaultAsync(cancellationToken);
+
     public async Task CreateAsync(Purchase newPurchase) =>
         await _purchasesCollection.InsertOneAsync(newPurchase);
 

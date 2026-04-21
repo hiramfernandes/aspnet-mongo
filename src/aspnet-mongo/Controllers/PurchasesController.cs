@@ -72,8 +72,12 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
-                await _purchasesService.CreateAsync(newPurchaseDto);
+                await _purchasesService.CreateAsync(newPurchaseDto, cancellationToken);
                 return Ok();
+            }
+            catch (InvalidOperationException oexc)
+            {
+                return BadRequest(oexc.Message);
             }
             catch (Exception exc)
             {

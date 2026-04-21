@@ -77,7 +77,7 @@ namespace Purchases.Application.Services
             {
                 await _messageNotifier.SendMessage(messageId, $"Error when deserializing Receipt message: {exc.Message}");
             }
-            await SavePurchaseAsync(nfcReceipt!, messageId, url);
+            await SavePurchaseAsync(nfcReceipt!, messageId, url, cancellationToken);
 
             return nfcReceipt;
         }
@@ -120,7 +120,7 @@ namespace Purchases.Application.Services
 
             var obtainedReceiptData = JsonSerializer.Deserialize<NfcReceipt>(modelAnalysisOutput, jsonOptions);
 
-            await SavePurchaseAsync(obtainedReceiptData!, chatMessageId);
+            await SavePurchaseAsync(obtainedReceiptData!, chatMessageId, default, cancellationToken);
         }
         #endregion Receipt Handling
 
@@ -136,7 +136,7 @@ namespace Purchases.Application.Services
             return BinaryData.FromStream(stream);
         }
 
-        private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, long chatId, string? url = null)
+        private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, long chatId, string? url, CancellationToken cancellationToken)
         {
             var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
 
@@ -163,7 +163,7 @@ namespace Purchases.Application.Services
                 ).ToArray(),
             };
 
-            await _purchaseService.CreateAsync(purchase);
+            await _purchaseService.CreateAsync(purchase, cancellationToken);
             await _messageNotifier.SendMessage(chatId, $"Successfully persisted NF on purchases");
         }
     }
