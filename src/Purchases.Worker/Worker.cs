@@ -4,15 +4,12 @@ namespace Purchases.Worker
 {
     public class Worker : BackgroundService
     {
-        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IPurchaseService _purchaseService;
         private readonly IReceiptRetrieverService _receiptRetrieverService;
         private readonly ILogger<Worker> _logger;
 
         public Worker(
             IServiceScopeFactory scopeFactory,
-            // IPurchaseService purchaseService,
-            // IReceiptRetrieverService receiptRetrieverService,
             ILogger<Worker> logger)
         {
             using IServiceScope scope = scopeFactory.CreateScope();
@@ -39,7 +36,7 @@ namespace Purchases.Worker
                             return;
 
                         var url = purchase.PurchaseUrl;
-                        var retrievedReceipt = await _receiptRetrieverService.HandleReceiptUrl(url, default, stoppingToken);
+                        var retrievedReceipt = await _receiptRetrieverService.HandleReceiptUrl(url!, default, stoppingToken);
 
                     }
                     catch (Exception exc)

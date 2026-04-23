@@ -71,7 +71,7 @@ namespace Purchases.Application.Services
             NfcReceipt nfcReceipt = new();
             try
             {
-                nfcReceipt = JsonSerializer.Deserialize<NfcReceipt>(llmResponse);
+                nfcReceipt = JsonSerializer.Deserialize<NfcReceipt>(llmResponse) ?? new();
             }
             catch (Exception exc)
             {
