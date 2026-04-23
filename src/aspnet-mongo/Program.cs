@@ -29,7 +29,7 @@ public class Program
                 policy
                     .WithOrigins(
                         "https://react-purchases.vercel.app"
-                        //"http://localhost:5173" // In case testing FE locally
+                        ,"http://localhost:5173" // In case testing FE locally
                         )
                     .AllowCredentials();
 
