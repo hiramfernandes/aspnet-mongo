@@ -22,7 +22,7 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
-                await TelegramServiceRouter(update.Message, null, cancellationToken);
+                //await TelegramServiceRouter(update.Message, null, cancellationToken);
 
                 return Ok();
             }
