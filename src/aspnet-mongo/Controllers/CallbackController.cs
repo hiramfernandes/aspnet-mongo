@@ -22,6 +22,7 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
+                _ = Task.Run(() => TelegramServiceRouter(update.Message, null, cancellationToken));
                 //await TelegramServiceRouter(update.Message, null, cancellationToken);
 
                 return Ok();

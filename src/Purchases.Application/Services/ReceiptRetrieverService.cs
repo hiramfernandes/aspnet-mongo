@@ -58,6 +58,9 @@ namespace Purchases.Application.Services
                         URL: {url}  
                         """;
 
+            if (_openAiSettings.TestMode)
+                await _messageNotifier.SendMessage(messageId, "Starting LLM Processing");
+
             var llmResponse = await _llmProcessor.Analyze(systemPrompt, userMessage);
 
             if (_openAiSettings.TestMode)
