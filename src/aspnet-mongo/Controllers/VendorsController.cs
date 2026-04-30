@@ -8,7 +8,7 @@ namespace aspnet_mongo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize]
     public class VendorsController : ControllerBase
     {
         private readonly IVendorService _vendorService;

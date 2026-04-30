@@ -8,8 +8,8 @@ namespace aspnet_mongo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
-    public class PurchasesController : ControllerBase
+    [Authorize]
+     public class PurchasesController : ControllerBase
     {
         private readonly IPurchaseService _purchasesService;
 
