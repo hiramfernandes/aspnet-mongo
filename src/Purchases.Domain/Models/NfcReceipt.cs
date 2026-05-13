@@ -10,7 +10,7 @@ public class NfcReceipt
     [JsonPropertyName("source")]
     public DataSource? Source { get; set; }
 
-    public QR? QR { get; set; }
+    public Qr? Qr { get; set; }
 
     [JsonPropertyName("merchant")]
     public Merchant? Merchant { get; set; }
@@ -48,7 +48,7 @@ public class DataSource
     [JsonPropertyName("notes")]
     public string[]? Notes { get; set; }
 }
-public class QR
+public class Qr
 {
     [JsonPropertyName("decoded_ok")]
     public bool? DecodedOk { get; set; }

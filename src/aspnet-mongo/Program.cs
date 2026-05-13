@@ -46,6 +46,7 @@ public class Program
         // Dependency Injection Setup for Services
         builder.Services.AddScoped<IPurchaseService, PurchaseService>();
         builder.Services.AddScoped<IVendorService, VendorService>();
+        builder.Services.AddScoped<IReceiptService, ReceiptService>();
         builder.Services.AddScoped<IReceiptRetrieverService, ReceiptRetrieverService>();
         builder.Services.AddScoped<IMessageNotifier, TelegramMessageNotifier>();
         builder.Services.AddScoped<IRemoteFileManager, TelegramRemoteFileManager>();
@@ -54,7 +55,8 @@ public class Program
         // DI for Repos
         builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
         builder.Services.AddScoped<IVendorRepository, VendorRepository>();
-
+        builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
+        
         builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("PurchasesDatabase"));
         builder.Services.Configure<TelegramIntegrationSettings>(builder.Configuration.GetSection("TelegramIntegration"));
         builder.Services.Configure<OpenAiSettings>(builder.Configuration.GetSection("OpenAiIntegration"));

@@ -16,9 +16,7 @@ public class VendorRepository : IVendorRepository
         IOptions<MongoDbSettings> databaseSettings,
         IMongoClient mongoClient)
     {
-        var connectionString = databaseSettings.Value.ConnectionString;
         var dbName = databaseSettings.Value.DatabaseName;
-
         var mongoDatabase = mongoClient.GetDatabase(dbName);
 
         _vendorsCollection = mongoDatabase.GetCollection<Vendor>(_collectionName);

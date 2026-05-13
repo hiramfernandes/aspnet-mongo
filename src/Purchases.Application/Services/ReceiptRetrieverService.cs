@@ -152,7 +152,7 @@ namespace Purchases.Application.Services
             var purchase = new PurchaseDto()
             {
                 PurchaseDate = purchaseDate.Date,
-                Url = url ?? obtainedReceiptData?.QR?.Url,
+                Url = url ?? obtainedReceiptData?.Qr?.Url,
                 VendorName = vendorName,
                 VendorId = null,
                 TotalAmount = obtainedReceiptData!.Totals?.Total,
