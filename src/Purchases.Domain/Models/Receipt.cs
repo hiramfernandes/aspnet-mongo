@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Purchases.Domain.Models;
 
 public class Receipt
 {
+    [BsonId]
     [JsonPropertyName("url")]
     public required string Url { get; set; }
 

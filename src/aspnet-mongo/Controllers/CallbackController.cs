@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using Purchases.Domain.Contracts.Services;
 using Purchases.Domain.Models;
 using Telegram.Bot.Types;
@@ -25,16 +26,6 @@ namespace aspnet_mongo.Controllers
         {
             try
             {
-                // Test receipt, just to make sure e2e works fine
-                var newReceipt = new Receipt()
-                {
-                    Url = "https://dfe-portal.svrs.rs.gov.br/Dfe/QrCodeNFce?p=43260593015006002590651160009611341091941561|2|1|1|9B9CAAD46C81EFC15C31206A03361618FA89E196",
-                    Processed = false,
-                    ReceivedDate = DateTime.UtcNow
-                };
-                
-                await _receiptService.CreteAsync(newReceipt, cancellationToken);
-                
                 _ = Task.Run(() => TelegramServiceRouter(update.Message, null, cancellationToken));
                 //await TelegramServiceRouter(update.Message, null, cancellationToken);
 
@@ -71,8 +62,20 @@ namespace aspnet_mongo.Controllers
                     throw new InvalidOperationException("Invalid URL");
                 
                 // Add receipt (see if needs to move to main receipt service)
-                var receipt = new Receipt{ Url = url, Processed = false, ReceivedDate = DateTime.UtcNow };
-                await _receiptService.CreteAsync(receipt, cancellationToken);
+                try
+                {
+                    var receipt = new Receipt { Url = url, Processed = false, ReceivedDate = DateTime.UtcNow };
+                    await _receiptService.CreteAsync(receipt, cancellationToken);
+                }
+                catch (MongoWriteException wexc) when  (wexc.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                {
+                    // Dupplicate record - move on
+                    await Task.Delay(100, cancellationToken);
+                }
+                catch (Exception wexc)
+                {
+                    throw;
+                }
 
                 await _receiptRetrieverService.HandleReceiptUrl(url, message?.Chat.Id ?? default, cancellationToken);
             }
