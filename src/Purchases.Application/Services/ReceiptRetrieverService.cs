@@ -36,27 +36,15 @@ namespace Purchases.Application.Services
         }
 
         #region Receipt Handling
+
         public async Task<NfcReceipt> HandleReceiptUrl(string url, long messageId, CancellationToken cancellationToken)
         {
-            var httpClient = _httpClientFactory.CreateClient("Scraper");
-            using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseContentRead, cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            if (_openAiSettings.TestMode)
-            {
-                await _messageNotifier.SendMessage(messageId, "URL content retrieved. Processing...");
-            }
-
-            // Return the full HTML string
-            var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
-
+            var htmlContent = await RetrieveHtmlContent(url, messageId, cancellationToken);
             var systemPrompt = Resources.ExtractReceiptBasedOnUrlInfo;
-
             var userMessage = $"""  
-                        HTML: {htmlContent}  
-                        URL: {url}  
-                        """;
+                               HTML: {htmlContent}  
+                               URL: {url}  
+                               """;
 
             if (_openAiSettings.TestMode)
                 await _messageNotifier.SendMessage(messageId, "Starting LLM Processing");
@@ -78,8 +66,10 @@ namespace Purchases.Application.Services
             }
             catch (Exception exc)
             {
-                await _messageNotifier.SendMessage(messageId, $"Error when deserializing Receipt message: {exc.Message}");
+                await _messageNotifier.SendMessage(messageId,
+                    $"Error when deserializing Receipt message: {exc.Message}");
             }
+
             await SavePurchaseAsync(nfcReceipt!, messageId, url, cancellationToken);
 
             return nfcReceipt;
@@ -125,6 +115,7 @@ namespace Purchases.Application.Services
 
             await SavePurchaseAsync(obtainedReceiptData!, chatMessageId, default, cancellationToken);
         }
+
         #endregion Receipt Handling
 
         private async Task<BinaryData> GetImageBinaryData(string fileId, CancellationToken cancellationToken)
@@ -139,7 +130,8 @@ namespace Purchases.Application.Services
             return BinaryData.FromStream(stream);
         }
 
-        private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, long chatId, string? url, CancellationToken cancellationToken)
+        private async Task SavePurchaseAsync(NfcReceipt obtainedReceiptData, long chatId, string? url,
+            CancellationToken cancellationToken)
         {
             var vendorName = obtainedReceiptData!.Merchant?.LegalName ?? obtainedReceiptData.Merchant?.TradeName;
 
@@ -168,6 +160,29 @@ namespace Purchases.Application.Services
 
             await _purchaseService.CreateAsync(purchase, cancellationToken);
             await _messageNotifier.SendMessage(chatId, $"Successfully persisted NF on purchases");
+        }
+
+        private async Task<string> RetrieveHtmlContent(
+            string url,
+            long messageId,
+            CancellationToken cancellationToken)
+        {
+            // Retrieve HTML Content for parsing
+            var httpClient = _httpClientFactory.CreateClient("Scraper");
+            using var response =
+                await httpClient.GetAsync(url, HttpCompletionOption.ResponseContentRead, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            if (_openAiSettings.TestMode)
+            {
+                await _messageNotifier.SendMessage(messageId, "URL content retrieved. Processing...");
+            }
+
+            // Return the full HTML string
+            var htmlContent = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            return htmlContent;
         }
     }
 }
